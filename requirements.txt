@@ -2,3 +2,4 @@ motor
 motor[srv]
 python-dotenv
 fastapi[all]
+passlib[bcrypt]
