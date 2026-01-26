@@ -7,11 +7,17 @@ async def create_sample_tweet(content: str):
 
     new_tweet = {
         "content": content,
-        "created_at": datetime.now(timezone.utc)
+        "created_at": datetime.now(timezone.utc),
+        "status": "pending"
     }
+    new_tweet_in_db = {**new_tweet,
+                        "tagged_by": None,
+                        "is_dangerous": None,
+                        "category": None
+                        }
 
     try:
-        result = await working_collection.insert_one(new_tweet)
+        result = await working_collection.insert_one(new_tweet_in_db)
         print(f"✅ New tweet created with id: {result.inserted_id}")
     except Exception as e:
         print("❌ An error occurred:", e)
