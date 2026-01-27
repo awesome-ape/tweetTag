@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
-from app.services.auth_service import register_user
 from pydantic import BaseModel
+from app.services.auth_service import register_user, login_user
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -11,18 +11,29 @@ class RegisterRequest(BaseModel):
     password: str
 
 
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+
 @router.post("/register")
 async def register(request: RegisterRequest):
     try:
-        user = await register_user(
-            username=request.username,
-            email=request.email,
-            password=request.password
+        return await register_user(
+            request.username,
+            request.email,
+            request.password
         )
-        return {
-            "message": "User created successfully",
-            "user": user
-        }
-
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/login")
+async def login(request: LoginRequest):
+    try:
+        return await login_user(
+            request.username,
+            request.password
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=401, detail=str(e))
