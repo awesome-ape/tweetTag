@@ -5,6 +5,7 @@ from datetime import datetime
 
 class TweetSchema(BaseModel):
     id: Optional[str] = Field(None, alias="_id")
+    uploaded_by: str
     content: str
     created_at: datetime
 
@@ -15,6 +16,7 @@ class TweetSchema(BaseModel):
 
 
 class TweetinDB(TweetSchema):
+    uploaded_by: str
     status: str ="pending"
     locked_at: Optional[datetime] = None
     tagged_by: Optional[str] = None
@@ -35,6 +37,13 @@ class taggSchema(BaseModel):
     is_dangerous: bool
     category: str
     tagged_by: str
+    locked_at: datetime
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+class taggSchemaFront(BaseModel):
+    is_dangerous: bool
+    category: str
+    tweet_id: str
     locked_at: datetime
     model_config = ConfigDict(arbitrary_types_allowed=True)
 

@@ -8,7 +8,8 @@ async def create_sample_tweet(content: str):
     new_tweet = {
         "content": content,
         "created_at": datetime.now(timezone.utc),
-        "status": "pending"
+        "status": "pending",
+        "uploaded_by": "charli"
     }
     new_tweet_in_db = {**new_tweet,
                         "tagged_by": None,
@@ -28,6 +29,15 @@ async def  run_seed():
     await create_sample_tweet("poopa")
     await create_sample_tweet("poopa floopa")
     await create_sample_tweet("floopa poopa!!!!!!!")
+    await create_sample_tweet("pooper!!!!!!!")
+    await create_sample_tweet("pooper flooper!!!!!!!")
+    await create_sample_tweet("poopon")
+    await create_sample_tweet("poopon floopon")
+    await create_sample_tweet("mr pooper")
+    await create_sample_tweet("mr flooper")
+    await create_sample_tweet("mr poopon")
+    await create_sample_tweet("mr floopon")
+    await create_sample_tweet("mr pooper flooper")
     close_mongo_connection()
 
 if __name__ == "__main__":

@@ -13,7 +13,7 @@ from bson import ObjectId
 base_dir = Path(__file__).resolve().parent.parent.parent.parent
 load_dotenv(dotenv_path=base_dir / ".env")
 
-async def claim_tweet () -> TweetinDB | None:
+async def claim_tweet (collection) -> TweetinDB | None:
     timeout_limit = int(os.getenv("TIMEOUT_LIMIT", "300"))  # default to 5 minutes if not set
     expiry_time = datetime.now(timezone.utc) - timedelta(seconds=timeout_limit)
 
@@ -28,7 +28,7 @@ async def claim_tweet () -> TweetinDB | None:
         "$set": { "status": "tagging", "locked_at": datetime.now(timezone.utc) }
     }
 
-    tweet_data = await working_collection.find_one_and_update(
+    tweet_data = await collection.find_one_and_update(
         query,
         update,
         return_document=ReturnDocument.AFTER
@@ -38,7 +38,8 @@ async def claim_tweet () -> TweetinDB | None:
 
     return TweetinDB.from_mongo(tweet_data)
 
-async def submit_tagged_tweet(payload: taggSchema) -> bool:
+async def submit_tagged_tweet(payload: taggSchema,collection) -> bool:
+    from app.db.database import  processed_collection
     # We combine the ID, status, AND the specific timestamp into one query
     query = {
         "_id": ObjectId(payload.tweet_id),
@@ -46,7 +47,7 @@ async def submit_tagged_tweet(payload: taggSchema) -> bool:
         "locked_at": payload.locked_at  # This is the "Security Guard"
     }
 
-    tweet = await working_collection.find_one_and_update(
+    tweet = await collection.find_one_and_update(
         query,
         {
             "$set": {
@@ -68,18 +69,28 @@ async def submit_tagged_tweet(payload: taggSchema) -> bool:
 
     # Move to processed and wipe from working
     await processed_collection.insert_one(tweet)
-    await working_collection.delete_one({"_id": tweet["_id"]})
+    await collection.delete_one({"_id": tweet["_id"]})
     
     return True
 
 
-async def escalate_tweet(payload: esclateSchema) :
+async def escalate_tweet(payload: esclateSchema):
     query = {"_id": ObjectId(payload.tweet_id), "status": "tagging", "locked_at": payload.locked_at}
+    
+    # 1. Just find it first to make sure the lock is still valid
     tweet = await working_collection.find_one(query)
+    
     if not tweet:
         raise ValueError("Escalation failed: Lock is invalid or has been taken by another user.")
+
+    # 2. Reset the status manually in the dictionary before inserting
+    tweet["status"] = "pending"
+    tweet["locked_at"] = None
+
+    # 3. Move it
     await escalation_collection.insert_one(tweet)
     await working_collection.delete_one({"_id": tweet["_id"]})
+    
     return True
 
 async def release_stale_locks(collection):
@@ -88,15 +99,12 @@ async def release_stale_locks(collection):
         now = datetime.now(timezone.utc)
         cutoff_time = now - timedelta(seconds=timeout_limit)
         
-        # DEBUG: See what the script thinks 'old' is
-        print(f"--- [DEBUG] Now: {now.strftime('%H:%M:%S')} | Cutoff: {cutoff_time.strftime('%H:%M:%S')} ---")
 
         # Let's see one tweet that it's NOT catching
         sample = await collection.find_one({"status": "tagging"})
         if sample:
             l_at = sample.get("locked_at")
             # If this prints, compare l_at to the Cutoff printed above
-            print(f"--- [DEBUG] Sample Tweet {sample['_id']} locked_at: {l_at} ---")
 
         result = await collection.update_many(
             {"status": "tagging", "locked_at": {"$lt": cutoff_time}},

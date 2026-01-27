@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from .db.database import connect_to_mongo, close_mongo_connection 
 from .controller.auth_controller import router as auth_router
 from app.controller.tweets_controller.tagger import router as tweets_router  
+from app.controller.tweets_controller.elscalation_controller import router as escalation_router
 from dotenv import load_dotenv
 from pathlib import Path
 from fastapi.middleware.cors import CORSMiddleware
@@ -47,4 +48,5 @@ app.add_middleware(
 # app/controllers/auth_controller.py
 app.include_router(auth_router)
 app.include_router(tweets_router, tags=["tweets"])
+app.include_router(escalation_router, tags=["escalation"])
 
