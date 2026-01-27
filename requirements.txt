@@ -3,3 +3,4 @@ motor[srv]
 python-dotenv
 fastapi[all]
 passlib[bcrypt]
+python-jose[cryptography]

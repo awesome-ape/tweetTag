@@ -1,16 +1,21 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
-from datetime import datetime
 
-class UserSchema(BaseModel):
+
+class UserInDB(BaseModel):
     id: Optional[str] = Field(None, alias="_id")
     username: str
     email: str
-    isADMIN: Optional[bool] = False
     password: str
+    isADMIN: bool = False
+
+    model_config = ConfigDict(populate_by_name=True)
 
 
-    model_config = ConfigDict(
-        populate_by_name=True,
-        arbitrary_types_allowed=True
-    )
+class UserResponse(BaseModel):
+    id: Optional[str] = Field(None, alias="_id")
+    username: str
+    email: str
+    isADMIN: bool
+
+    model_config = ConfigDict(populate_by_name=True)
