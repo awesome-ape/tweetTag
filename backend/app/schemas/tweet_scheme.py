@@ -22,7 +22,7 @@ class TweetinDB(TweetSchema):
     tagged_by: Optional[str] = None
     is_dangerous: Optional[bool] = None
     category: Optional[str] = None
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True,extra="ignore")
 
     @classmethod
     def from_mongo(cls, data: dict):
