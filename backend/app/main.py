@@ -4,6 +4,7 @@ from .db.database import connect_to_mongo, close_mongo_connection
 from .controller.auth_controller import router as auth_router
 from app.controller.tweets_controller.tagger import router as tweets_router  
 from app.controller.tweets_controller.elscalation_controller import router as escalation_router
+from app.controller.tweets_controller.display_controller import router as display_router
 from dotenv import load_dotenv
 from pathlib import Path
 from fastapi.middleware.cors import CORSMiddleware
@@ -49,4 +50,5 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(tweets_router, tags=["tweets"])
 app.include_router(escalation_router, tags=["escalation"])
+app.include_router(display_router, tags=["display"])
 
