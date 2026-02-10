@@ -1,0 +1,57 @@
+/* login.css */
+
+.login-card {
+    background-color: var(--card-bg);
+    backdrop-filter: blur(12px);
+    padding: 2.5rem;
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: 1fr 1fr; /* Two columns */
+    grid-template-areas: 
+        "title title"
+        "user  user"
+        "pass  pass"
+        "reg   sub";
+        
+    width: 100%;
+    max-width: 400px;
+}
+
+/* This lets the grid see the Input components directly */
+form { 
+    display: contents; 
+}
+
+.login-header {
+    grid-area: title;
+    justify-self: center; /* Centers the title in the grid area */
+    text-align: center;
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+/* Force each input wrapper to occupy both columns of its row */
+.username-input { grid-area: user; }
+
+.password-input { grid-area: pass; }
+
+.input-wrapper {
+    grid-column: span 2; /* Safety fallback to ensure it takes the full row */
+    width: 100%;
+    display: flex;
+    justify-content: center; /* This centers the input horizontally */
+    align-items: center;
+}
+
+.input-wrapper input {
+    width: 100%;
+    max-width: 320px; /* Adjust this number to make the boxes wider or thinner */
+    box-sizing: border-box; /* Prevents padding from pushing it off-center */
+}
+
+/* Place buttons side-by-side in the last row */
+.btn-reg { grid-area: reg; justify-self: center; }
+.btn-sub { grid-area: sub; justify-self: center; }
