@@ -6,8 +6,7 @@ export default function TweetsPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
-  const serverUrl =
-    import.meta.env.VITE_SERVER_URL || "http://127.0.0.1:8000";
+  const serverUrl = import.meta.env.VITE_SERVER_URL || "http://127.0.0.1:8000";
 
   const fetchSingleTweet = async () => {
     setLoading(true);
@@ -21,28 +20,22 @@ export default function TweetsPage() {
     }
 
     try {
-      const res = await fetch(
-        `${serverUrl}/get_tweets_for_display?page=1`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await fetch(`${serverUrl}/claim_tweet`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        throw new Error(data.detail || "Failed to fetch tweet");
+        throw new Error(data?.detail || "Failed to claim tweet");
       }
 
-      // השרת מחזיר list[tuple[TweetinDB, str]]
-      // כלומר [[tweet, username], ...]
-      const firstTweet = data[0][0]; 
-      setTweet(firstTweet);
-
+      // כאן זה כבר TweetinDB ישירות
+      setTweet(data);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Request failed");
     } finally {
       setLoading(false);
     }
@@ -60,12 +53,15 @@ export default function TweetsPage() {
     <div className="tweets-page">
       <div className="tweet-card">
         <div className="tweet-date">
-          {new Date(tweet.created_at).toLocaleString()}
+          {tweet.created_at ? new Date(tweet.created_at).toLocaleString() : ""}
         </div>
 
-        <div className="tweet-content">
-          {tweet.content}
-        </div>
+        <div className="tweet-content">{tweet.content}</div>
+
+        {/* בונוס קטן: למשוך עוד ציוץ */}
+        <button className="btn btn-dark" onClick={fetchSingleTweet}>
+          Pull another tweet
+        </button>
       </div>
     </div>
   );
