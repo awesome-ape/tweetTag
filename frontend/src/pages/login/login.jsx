@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import Input from '../../components/Input/Input';
+import { Link } from 'react-router-dom';
 import Button from '../../components/Button/Button';
 import ErrorModal from '../../components/ErrorModal/ErrorModal';
-import './login.css';
+import styles from './login.module.css'; 
+
+
 function App() {
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [showError, setShowError] = useState(false);
@@ -15,71 +18,41 @@ function App() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleAction = async (type) => {
     const serverUrl = import.meta.env.VITE_SERVER_URL;
-    const isLogin = type === 'Login';
-    const url = `${serverUrl}/auth/${type.toLowerCase()}`;
-
-    // --- REGISTRATION REDIRECT PLACEHOLDER ---
-    if (type === 'Register') {
-      console.log("Redirecting to Registration Page...");
-      alert("Registration page coming soon! For now, use the Login button.");
-      return; 
-    }
-
-    let options = {
-      method: 'POST',
-    };
-
-    if (isLogin) {
-      // OAuth2PasswordRequestForm expects x-www-form-urlencoded
-      const formDataBody = new URLSearchParams();
-      formDataBody.append('username', formData.username);
-      formDataBody.append('password', formData.password);
-
-      options.headers = {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      };
-      options.body = formDataBody;
-    }
+    const url = `${serverUrl}/auth/login`;
 
     try {
-      const response = await fetch(url, options);
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(formData)
+      });
       const data = await response.json();
-
-      if (response.ok) {
-        console.log("Server Response:", data);
-        alert("Login Successful! Check console for token.");
-      } else {
-        console.error("Login Failed:", data.detail);
-        triggerError(data.detail || "Login failed. Please check your credentials.");
-      }
+      if (response.ok) alert("Login Successful!");
+      else triggerError(data.detail || "Login failed.");
     } catch (err) {
-      console.error("Request Failed", err);
-      triggerError("Could not connect to the server. Is the FastAPI backend running?");
+      triggerError("Could not connect to the server.");
     }
   };
 
   return (
     <div className="app-wrapper">
-      <div className="login-card">
-        <header className="login-header">Welcome to TweetTag</header>
+      <div className={styles['login-card']}>
+        <header className={styles['login-header']}>Welcome to TweetTag</header>
         <form onSubmit={(e) => { e.preventDefault(); handleAction('Login'); }}>
           <Input 
-            className="username-input" 
+            className={styles['username-input']} 
             name="username" 
             value={formData.username}
             placeholder="Username" 
             onChange={handleChange} 
           />
           <Input 
-            className="password-input" 
+            className={styles['password-input']} 
             name="password" 
             type="password" 
             value={formData.password} 
@@ -87,17 +60,12 @@ function App() {
             onChange={handleChange} 
           />
           
+          <div className={styles['reg-container']}>
+            Don't have an account? <Link to="/register" className={styles['signup-link']}>Sign Up</Link>
+          </div>
+
           <Button 
-            className="btn-reg" 
-            type="button" 
-            onClick={() => handleAction('Register')} 
-            variant="outline"
-          >
-            Register
-          </Button>
-          
-          <Button 
-            className="btn-sub" 
+            className={styles['btn-sub']} 
             type="submit" 
             variant="primary"
           >
@@ -105,12 +73,7 @@ function App() {
           </Button>
         </form>
       </div>
-      {showError && (
-        <ErrorModal 
-          message={errorMessage} 
-          onClose={() => setShowError(false)} 
-        />
-      )}
+      {showError && <ErrorModal message={errorMessage} onClose={() => setShowError(false)} />}
     </div>
   );
 }
