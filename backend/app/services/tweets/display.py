@@ -1,12 +1,12 @@
 import asyncio
 from unittest import result
-from app.db.database import (
+from backend.app.db.database import (
     backup_collection,
     escalation_collection,
     working_collection,
     processed_collection,
 )
-from app.schemas.tweet_scheme import TweetinDB
+from backend.app.schemas.tweet_scheme import TweetinDB
 from typing import List
 from dotenv import load_dotenv
 import os

@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from app.services.auth_service import register_user, login_user
+
+# Add 'backend.' here to match the project root path
+from backend.app.services.auth_service import register_user, login_user
 from fastapi.security import OAuth2PasswordRequestForm
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
