@@ -1,11 +1,11 @@
 from email import header
-from app.services.tweets import tagger
-from app.schemas.tweet_scheme import TweetinDB, taggSchemaFront
+from backend.app.services.tweets import tagger
+from backend.app.schemas.tweet_scheme import TweetinDB, taggSchemaFront
 from fastapi import APIRouter, HTTPException, Depends, Header
-from app.schemas.tweet_scheme import taggSchema, esclateSchema
-from app.services.users.users import is_admin
-from app.db.database import working_collection
-from app.dependencies.auth import get_current_user
+from backend.app.schemas.tweet_scheme import taggSchema, esclateSchema
+from backend.app.services.users.users import is_admin
+from backend.app.db.database import working_collection
+from backend.app.dependencies.auth import get_current_user
 
 
 router = APIRouter()

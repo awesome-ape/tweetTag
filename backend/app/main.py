@@ -2,16 +2,18 @@ from fastapi import APIRouter, FastAPI
 from contextlib import asynccontextmanager
 from .db.database import connect_to_mongo, close_mongo_connection
 from .controller.auth_controller import router as auth_router
-from app.controller.tweets_controller.tagger import router as tweets_router
-from app.controller.tweets_controller.elscalation_controller import (
+from backend.app.controller.tweets_controller.tagger import router as tweets_router
+from backend.app.controller.tweets_controller.elscalation_controller import (
     router as escalation_router,
 )
-from app.controller.tweets_controller.display_controller import router as display_router
+from backend.app.controller.tweets_controller.display_controller import (
+    router as display_router,
+)
 from dotenv import load_dotenv
 from pathlib import Path
 from fastapi.middleware.cors import CORSMiddleware
-from app.db.database import working_collection, escalation_collection
-from app.services.tweets.tagger import release_stale_locks
+from backend.app.db.database import working_collection, escalation_collection
+from backend.app.services.tweets.tagger import release_stale_locks
 import asyncio
 from asyncio import create_task
 

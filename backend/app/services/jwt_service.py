@@ -1,13 +1,13 @@
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
-from app.core.security import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
+from backend.app.core.security import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
 
 def create_access_token(user_id: str) -> str:
     payload = {
-        "sub": user_id,                     # 🔑 כאן ה־user_id
+        "sub": user_id,  # 🔑 כאן ה־user_id
         "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
-        "iat": datetime.utcnow()
+        "iat": datetime.utcnow(),
     }
 
     token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)

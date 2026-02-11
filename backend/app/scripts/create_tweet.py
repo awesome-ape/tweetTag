@@ -1,21 +1,26 @@
 import asyncio
 from datetime import datetime, timezone
-from app.db.database import working_collection, connect_to_mongo,close_mongo_connection
+from backend.app.db.database import (
+    working_collection,
+    connect_to_mongo,
+    close_mongo_connection,
+)
+
 
 async def create_sample_tweet(content: str):
-
 
     new_tweet = {
         "content": content,
         "created_at": datetime.now(timezone.utc),
         "status": "pending",
-        "uploaded_by": "charli"
+        "uploaded_by": "charli",
     }
-    new_tweet_in_db = {**new_tweet,
-                        "tagged_by": None,
-                        "is_dangerous": None,
-                        "category": None
-                        }
+    new_tweet_in_db = {
+        **new_tweet,
+        "tagged_by": None,
+        "is_dangerous": None,
+        "category": None,
+    }
 
     try:
         result = await working_collection.insert_one(new_tweet_in_db)
@@ -23,7 +28,8 @@ async def create_sample_tweet(content: str):
     except Exception as e:
         print("❌ An error occurred:", e)
 
-async def  run_seed():
+
+async def run_seed():
     connect_to_mongo()
     await create_sample_tweet("Hello, this is a sample tweet!")
     await create_sample_tweet("poopa")
@@ -40,6 +46,6 @@ async def  run_seed():
     await create_sample_tweet("mr pooper flooper")
     close_mongo_connection()
 
+
 if __name__ == "__main__":
     asyncio.run(run_seed())
-    

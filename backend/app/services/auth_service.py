@@ -1,7 +1,7 @@
 from passlib.context import CryptContext
-from app.db.database import users_collection
-from app.schemas.user_schema import UserInDB, UserResponse
-from app.services.jwt_service import create_access_token
+from backend.app.db.database import users_collection
+from backend.app.schemas.user_schema import UserInDB, UserResponse
+from backend.app.services.jwt_service import create_access_token
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -15,9 +15,9 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 
 async def register_user(username: str, email: str, password: str):
-    existing_user = await users_collection.find_one({
-        "$or": [{"username": username}, {"email": email}]
-    })
+    existing_user = await users_collection.find_one(
+        {"$or": [{"username": username}, {"email": email}]}
+    )
 
     if existing_user:
         raise ValueError("User already exists")
@@ -26,7 +26,7 @@ async def register_user(username: str, email: str, password: str):
         "username": username,
         "email": email,
         "password": hash_password(password),
-        "isADMIN": False
+        "isADMIN": False,
     }
 
     result = await users_collection.insert_one(user_dict)
@@ -55,9 +55,4 @@ async def login_user(username: str, password: str):
 
     token = create_access_token(user_id=user["_id"])
 
-    return {
-        "access_token": token,
-        "token_type": "bearer",
-        "user": UserResponse(**user)
-    }
-
+    return {"access_token": token, "token_type": "bearer", "user": UserResponse(**user)}

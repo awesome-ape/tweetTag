@@ -1,12 +1,12 @@
 from http.client import HTTPException
 
 from fastapi.params import Header
-from app.schemas.tweet_scheme import TweetinDB, taggSchema, taggSchemaFront
-from app.services.tweets import esclation
-from app.services.users.users import is_admin
+from backend.app.schemas.tweet_scheme import TweetinDB, taggSchema, taggSchemaFront
+from backend.app.services.tweets import esclation
+from backend.app.services.users.users import is_admin
 from fastapi import APIRouter, Depends
 
-from app.dependencies.auth import get_current_user
+from backend.app.dependencies.auth import get_current_user
 
 router = APIRouter()
 
