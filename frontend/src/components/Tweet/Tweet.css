@@ -1,0 +1,21 @@
+.tweet-card {
+  background: var(--card-bg);
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin: 10px 0;
+}
+
+.tweet-date {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-bottom: 8px;
+  color: var(--text-color);
+}
+
+.tweet-content {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-color);
+  white-space: pre-wrap;
+}
