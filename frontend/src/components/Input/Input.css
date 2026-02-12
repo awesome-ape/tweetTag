@@ -1,6 +1,10 @@
 /* Input.css */
 .input-wrapper {
-    display: contents; /* Lets the input inside talk to the grid */
+   
+    display: flex;
+    justify-content: center; /* Centers the input horizontally */
+    align-items: center;
+    width: 100%;            /* Fills the grid area */
 }
 
 input {

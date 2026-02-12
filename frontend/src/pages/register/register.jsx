@@ -1,16 +1,12 @@
-import React, { useState } from "react";
-import Input from "../../components/Input/Input.jsx";
-import Button from "../../components/Button/Button.jsx";
-import ErrorModal from "../../components/ErrorModal/ErrorModal.jsx";
-import "./register.css";
-
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom.jsx';
+import Input from '../../components/Input/Input.jsx';
+import Button from '../../components/Button/Button.jsx';
+import ErrorModal from '../../components/ErrorModal/ErrorModal.jsx';
+import styles from './register.module.css';
 export default function RegisterPage() {
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-  });
-
+function App() {
+  const [formData, setFormData] = useState({ username: '', email: '', password: '' });
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -24,117 +20,73 @@ export default function RegisterPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAction = async (type) => {
-    const serverUrl = import.meta.env.VITE_SERVER_URL || "http://127.0.0.1:8000";
-
-    const isLogin = type === "Login";
-    const url = `${serverUrl}/auth/${type.toLowerCase()}`;
-
-    const options = { method: "POST", headers: {} };
-
-    if (isLogin) {
-      // OAuth2PasswordRequestForm expects x-www-form-urlencoded
-      const body = new URLSearchParams();
-      body.append("username", formData.username);
-      body.append("password", formData.password);
-
-      options.headers["Content-Type"] = "application/x-www-form-urlencoded";
-      options.body = body;
-    } else {
-      // Typical register endpoint expects JSON
-      options.headers["Content-Type"] = "application/json";
-      options.body = JSON.stringify({
-        username: formData.username,
-        email: formData.email,
-        password: formData.password,
-      });
-    }
+  const handleAction = async () => {
+    const serverUrl = import.meta.env.VITE_SERVER_URL;
+    const url = `${serverUrl}/auth/register`;
 
     try {
-      const response = await fetch(url, options);
-
-      // sometimes errors return non-json
-      const text = await response.text();
-      let data;
-      try {
-        data = text ? JSON.parse(text) : {};
-      } catch {
-        data = { detail: text };
-      }
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      const data = await response.json();
 
       if (response.ok) {
-        console.log("Server Response:", data);
-        alert(`${type} Successful! Check console.`);
+        alert("Registration Successful!");
       } else {
-        console.error(`${type} Failed:`, data);
-        triggerError(data?.detail || `${type} failed.`);
+        triggerError(data.detail || "Registration failed.");
       }
     } catch (err) {
-      console.error("Request Failed", err);
-      triggerError(
-        `Could not connect to the server (${serverUrl}). Is the FastAPI backend running?`
-      );
+      triggerError("Could not connect to the server.");
     }
   };
 
   return (
     <div className="app-wrapper">
-      <div className="login-card">
-        <header className="login-header">Register</header>
-
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleAction("Register");
-          }}
-        >
-          <Input
-            className="username-input"
-            name="username"
+      <div className={styles['register-card']}>
+        <header className={styles['login-header']}>Register</header>
+        <form onSubmit={(e) => { e.preventDefault(); handleAction(); }}>
+          <Input 
+            className={styles['username-input']} 
+            name="username" 
             value={formData.username}
             placeholder="Username"
             onChange={handleChange}
           />
 
           <Input
-            className="email-input"
+            className={styles['email-input']}
             name="email"
             value={formData.email}
-            placeholder="myemail@email.com"
+            placeholder="Email@email.com"
             onChange={handleChange}
           />
-
-          <Input
-            className="password-input"
-            name="password"
-            type="password"
-            value={formData.password}
-            placeholder="Password"
-            onChange={handleChange}
+          <Input 
+            className={styles['password-input']} 
+            name="password" 
+            type="password" 
+            value={formData.password} 
+            placeholder="Password" 
+            onChange={handleChange} 
           />
-
-          <Button
-            className="btn-reg"
-            type="submit"
-            variant="outline"
+          
+          <Button 
+            className={styles['btn-reg']} 
+            type="submit" 
+            variant="primary"
           >
             Register
           </Button>
 
-          <Button
-            className="btn-sub"
-            type="button"
-            onClick={() => handleAction("Login")}
-            variant="primary"
-          >
-            Login
-          </Button>
+          <div className={styles['footer-text']}>
+            Already have an account? <div><Link to="/login" className={styles['signin-link']}>Sign in</Link>
+          </div>
+          </div>
         </form>
       </div>
-
-      {showError && (
-        <ErrorModal message={errorMessage} onClose={() => setShowError(false)} />
-      )}
+      {showError && <ErrorModal message={errorMessage} onClose={() => setShowError(false)} />}
     </div>
   );
+  }
 }
