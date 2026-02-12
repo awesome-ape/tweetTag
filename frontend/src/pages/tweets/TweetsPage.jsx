@@ -32,7 +32,6 @@ export default function TweetsPage() {
         throw new Error(data?.detail || "Failed to claim tweet");
       }
 
-      // כאן זה כבר TweetinDB ישירות
       setTweet(data);
     } catch (err) {
       setError(err.message || "Request failed");
@@ -58,7 +57,7 @@ export default function TweetsPage() {
 
         <div className="tweet-content">{tweet.content}</div>
 
-        {/* בונוס קטן: למשוך עוד ציוץ */}
+        {}
         <button className="btn btn-dark" onClick={fetchSingleTweet}>
           Pull another tweet
         </button>
