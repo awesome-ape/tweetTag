@@ -31,6 +31,16 @@ export default function Login() {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams(formData)
       });
+      if(!formData.password){
+        const error = "please fill in you'r passowrd"
+        triggerError(error)
+        return
+      }
+      if(!formData.username){
+        const error = "please fill in you'r username"
+        triggerError(error)
+        return
+      }
       
       const data = await response.json();
 
@@ -42,7 +52,10 @@ export default function Login() {
         // Redirect to home page
         navigate("/home");
       } else {
-        triggerError(data.detail || "Login failed.");
+        const errorMsg = Array.isArray(data.detail) 
+        ? data.detail[0].msg 
+        : data.detail || "Login failed.";
+        triggerError(errorMsg);
       }
     } catch (err) {
       triggerError(`Could not connect to the server (${url}).`);

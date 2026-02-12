@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom.jsx';
+import { Link,useNavigate } from 'react-router-dom';
 import Input from '../../components/Input/Input.jsx';
 import Button from '../../components/Button/Button.jsx';
 import ErrorModal from '../../components/ErrorModal/ErrorModal.jsx';
 import styles from './register.module.css';
+
 export default function RegisterPage() {
-function App() {
+  // Removed the "function App() {" line - everything stays inside RegisterPage
   const [formData, setFormData] = useState({ username: '', email: '', password: '' });
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
 
   const triggerError = (msg) => {
     setErrorMessage(msg);
@@ -23,6 +25,23 @@ function App() {
   const handleAction = async () => {
     const serverUrl = import.meta.env.VITE_SERVER_URL;
     const url = `${serverUrl}/auth/register`;
+     if(!formData.password){
+        const error = "please fill in you'r passowrd"
+        triggerError(error)
+        return
+      }
+      if(!formData.username){
+        const error = "please fill in you'r username"
+        triggerError(error)
+        return
+      }
+      if(!formData.email){
+        const error = "please fill in you'r email adress"
+        triggerError(error)
+        return
+      }
+      
+    
 
     try {
       const response = await fetch(url, {
@@ -34,6 +53,8 @@ function App() {
 
       if (response.ok) {
         alert("Registration Successful!");
+        navigate("/login")
+
       } else {
         triggerError(data.detail || "Registration failed.");
       }
@@ -71,6 +92,11 @@ function App() {
             onChange={handleChange} 
           />
           
+          <div className={styles['footer-text']}>
+            Already have an account? 
+            <Link to="/login" className={styles['signin-link']}>Sign in</Link>
+          </div>
+
           <Button 
             className={styles['btn-reg']} 
             type="submit" 
@@ -78,15 +104,9 @@ function App() {
           >
             Register
           </Button>
-
-          <div className={styles['footer-text']}>
-            Already have an account? <div><Link to="/login" className={styles['signin-link']}>Sign in</Link>
-          </div>
-          </div>
         </form>
       </div>
       {showError && <ErrorModal message={errorMessage} onClose={() => setShowError(false)} />}
     </div>
   );
-  }
-}
+} // Only one closing bracket here!
