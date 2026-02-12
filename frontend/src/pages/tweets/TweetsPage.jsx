@@ -1,67 +1,64 @@
-import React, { useEffect, useState } from "react";
-import "./TweetsPage.css";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import "./Home.css";
 
-export default function TweetsPage() {
-  const [tweet, setTweet] = useState(null);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
+export default function Home() {
+  const navigate = useNavigate();
 
-  const serverUrl = import.meta.env.VITE_SERVER_URL || "http://127.0.0.1:8000";
+  const username = localStorage.getItem("username") || "User";
 
-  const fetchSingleTweet = async () => {
-    setLoading(true);
-    setError("");
-
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setError("Missing token. Please login again.");
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const res = await fetch(`${serverUrl}/claim_tweet`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await res.json().catch(() => ({}));
-
-      if (!res.ok) {
-        throw new Error(data?.detail || "Failed to claim tweet");
-      }
-
-      // כאן זה כבר TweetinDB ישירות
-      setTweet(data);
-    } catch (err) {
-      setError(err.message || "Request failed");
-    } finally {
-      setLoading(false);
-    }
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    navigate("/login");
   };
 
-  useEffect(() => {
-    fetchSingleTweet();
-  }, []);
-
-  if (loading) return <div className="center">Loading...</div>;
-  if (error) return <div className="center error">{error}</div>;
-  if (!tweet) return <div className="center">No tweet found</div>;
-
   return (
-    <div className="tweets-page">
-      <div className="tweet-card">
-        <div className="tweet-date">
-          {tweet.created_at ? new Date(tweet.created_at).toLocaleString() : ""}
+    <div className="home-page">
+      
+      {/* ====== NAVBAR ====== */}
+      <div className="navbar">
+        <div className="nav-left">
+          TweetTag #
         </div>
 
-        <div className="tweet-content">{tweet.content}</div>
+        <div className="nav-right">
+          <span className="username">👤 {username}</span>
+          <button className="logout-btn" onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
+      </div>
 
-        {/* בונוס קטן: למשוך עוד ציוץ */}
-        <button className="btn btn-dark" onClick={fetchSingleTweet}>
-          Pull another tweet
-        </button>
+      {/* רקע */}
+      <div className="home-bg"></div>
+
+      <div className="home-container">
+        <div className="card">
+          <h2>TweetTag #</h2>
+          <p className="welcome">hello {username}!</p>
+
+          <button
+            className="btn btn-dark"
+            onClick={() => navigate("/tweets")}
+          >
+            pull random tweet
+          </button>
+
+          <button
+            className="btn btn-mid"
+            onClick={() => navigate("/my-tags")}
+          >
+            view my tags
+          </button>
+
+          <button
+            className="btn btn-light"
+            onClick={() => navigate("/database")}
+          >
+            view database
+          </button>
+        </div>
       </div>
     </div>
   );
