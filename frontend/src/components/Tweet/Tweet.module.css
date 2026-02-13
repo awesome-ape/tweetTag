@@ -1,0 +1,24 @@
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  padding: 32px 36px;
+  margin: 20px 0;
+  width: 850px;
+  max-width: 95%;
+  box-shadow: var(--shadow-card);
+}
+
+.date {
+  font-size: 14px;
+  opacity: 0.6;
+  margin-bottom: 14px;
+  color: var(--text-color);
+}
+
+.content {
+  font-size: 19px;
+  line-height: 1.8;
+  color: var(--text-color);
+  white-space: pre-wrap;
+}

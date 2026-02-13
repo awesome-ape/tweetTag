@@ -1,10 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "./Home.css";
+import styles from "./Home.module.css";
 
 export default function Home() {
   const navigate = useNavigate();
-
   const username = localStorage.getItem("username") || "User";
 
   const handleLogout = () => {
@@ -14,46 +13,43 @@ export default function Home() {
   };
 
   return (
-    <div className="home-page">
-      
+    <div className={styles.page}>
       {/* ====== NAVBAR ====== */}
-      <div className="navbar">
-        <div className="nav-left">
-          TweetTag #
-        </div>
+      <div className={styles.navbar}>
+        <div className={styles.navLeft}>TweetTag #</div>
 
-        <div className="nav-right">
-          <span className="username">👤 {username}</span>
-          <button className="logout-btn" onClick={handleLogout}>
+        <div className={styles.navRight}>
+          <span className={styles.username}>👤 {username}</span>
+          <button className={styles.logoutBtn} onClick={handleLogout}>
             Logout
           </button>
         </div>
       </div>
 
       {/* רקע */}
-      <div className="home-bg"></div>
+      <div className={styles.bg} />
 
-      <div className="home-container">
-        <div className="card">
-          <h2>TweetTag #</h2>
-          <p className="welcome">hello {username}!</p>
+      <div className={styles.container}>
+        <div className={styles.card}>
+          <h2 className={styles.title}>TweetTag #</h2>
+          <p className={styles.welcome}>hello {username}!</p>
 
           <button
-            className="btn btn-dark"
+            className={`${styles.btn} ${styles.btnDark}`}
             onClick={() => navigate("/tweets")}
           >
             pull random tweet
           </button>
 
           <button
-            className="btn btn-mid"
+            className={`${styles.btn} ${styles.btnMid}`}
             onClick={() => navigate("/my-tags")}
           >
             view my tags
           </button>
 
           <button
-            className="btn btn-light"
+            className={`${styles.btn} ${styles.btnLight}`}
             onClick={() => navigate("/database")}
           >
             view database

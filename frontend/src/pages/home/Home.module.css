@@ -1,0 +1,154 @@
+/* ===== PAGE WRAPPER ===== */
+
+.page {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: transparent;
+  color: var(--text-color);
+}
+
+/* ===== BACKGROUND (לא חוסם קליקים) ===== */
+
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ===== NAVBAR ===== */
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  height: 60px;
+  background-color: var(--nav-bg);
+  color: var(--nav-text);
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 0 40px;
+  box-sizing: border-box;
+
+  z-index: 1000;
+}
+
+.navLeft {
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: 1px;
+}
+
+.navRight {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.username {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+/* ===== MAIN CONTENT ===== */
+
+.container {
+  position: relative;
+  z-index: 2;
+
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding-top: 60px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+/* ===== CARD ===== */
+
+.card {
+  width: 380px;
+  max-width: 95vw;
+  padding: 30px;
+
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  text-align: center;
+
+  background: var(--card-bg);
+  box-shadow: var(--shadow-card);
+
+  position: relative;
+  z-index: 3;
+}
+
+.title {
+  margin: 0 0 10px;
+}
+
+.welcome {
+  margin-bottom: 25px;
+  font-size: 14px;
+  color: var(--text-color);
+}
+
+/* ===== BUTTONS ===== */
+
+.btn {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
+}
+
+.btnDark {
+  background-color: var(--accent-color);
+  color: var(--btn-text);
+}
+
+.btnMid {
+  background-color: var(--tweeter-blue);
+  color: var(--btn-text);
+}
+
+.btnLight {
+  background-color: var(--accent-color);
+  color: var(--btn-text);
+  opacity: 0.85;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.92;
+}
+
+/* ===== LOGOUT BUTTON ===== */
+
+.logoutBtn {
+  background-color: var(--danger);
+  border: none;
+  padding: 8px 16px;
+  color: var(--nav-text);
+  cursor: pointer;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.logoutBtn:hover {
+  transform: translateY(-1px);
+  filter: brightness(0.9);
+}
