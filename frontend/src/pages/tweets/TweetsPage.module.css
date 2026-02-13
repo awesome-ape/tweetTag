@@ -6,9 +6,8 @@
   padding: 40px 20px;
 }
 
-/* ריספונסיבי: גדל יפה במסכים גדולים, ולא נשבר בקטנים */
 .container {
-  width: min(1100px, 95vw);  /* במקום 1500px + max-width */
+  width: min(1100px, 95vw); 
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -20,7 +19,7 @@
   display: flex;
   justify-content: center;
   gap: 20px;
-  flex-wrap: wrap; /* אם המסך קטן, הכפתורים ירדו שורה ולא יישברו */
+  flex-wrap: wrap; 
 }
 
 .btn {
