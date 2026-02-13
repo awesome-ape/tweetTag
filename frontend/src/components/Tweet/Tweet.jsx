@@ -1,11 +1,14 @@
-import "./Tweet.css";
+import styles from "./Tweet.module.css";
 
 export default function Tweet({ tweet }) {
-  const date = tweet?.created_at ? new Date(tweet.created_at).toLocaleString() : "";
+  const date = tweet?.created_at
+    ? new Date(tweet.created_at).toLocaleString()
+    : "";
+
   return (
-    <div className="tweet-card">
-      <div className="tweet-date">{date}</div>
-      <div className="tweet-content">{tweet?.content}</div>
+    <div className={styles.card}>
+      <div className={styles.date}>{date}</div>
+      <div className={styles.content}>{tweet?.content}</div>
     </div>
   );
 }

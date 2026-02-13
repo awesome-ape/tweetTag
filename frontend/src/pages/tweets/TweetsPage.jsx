@@ -1,62 +1,81 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../home/Home.css";
+import Tweet from "../../components/Tweet/Tweet.jsx";
+import styles from "./TweetsPage.module.css";
 
-export default function Home() {
+export default function TweetsPage() {
   const navigate = useNavigate();
 
-  const username = localStorage.getItem("username") || "User";
+  const [tweet, setTweet] = useState(null);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("username");
-    navigate("/login");
+  const serverUrl =
+    import.meta.env.VITE_SERVER_URL || "http://127.0.0.1:8000";
+
+  const fetchSingleTweet = async () => {
+    setLoading(true);
+    setError("");
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const res = await fetch(`${serverUrl}/claim_tweet`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.detail || "Failed to fetch tweet");
+      }
+
+      setTweet(data);
+    } catch (err) {
+      setError(err?.message || "Unknown error");
+      setTweet(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  return (
-    <div className="home-page">
-      
-      {/* ====== NAVBAR ====== */}
-      <div className="navbar">
-        <div className="nav-left">
-          TweetTag #
-        </div>
+  useEffect(() => {
+    fetchSingleTweet();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-        <div className="nav-right">
-          <span className="username">👤 {username}</span>
-          <button className="logout-btn" onClick={handleLogout}>
-            Logout
-          </button>
-        </div>
+  if (loading) return <div className={styles.center}>Loading...</div>;
+  if (error)
+    return (
+      <div className={`${styles.center} ${styles.error}`}>
+        Error: {error}
       </div>
+    );
 
-      {/* רקע */}
-      <div className="home-bg"></div>
+  return (
+    <div className={styles.page}>
+      <div className={styles.container}>
+        {tweet ? <Tweet tweet={tweet} /> : <p>No tweet available</p>}
 
-      <div className="home-container">
-        <div className="card">
-          <h2>TweetTag #</h2>
-          <p className="welcome">hello {username}!</p>
-
+        <div className={styles.actions}>
           <button
-            className="btn btn-dark"
-            onClick={() => navigate("/tweets")}
+            className={`${styles.btn} ${styles.btnPrimary}`}
+            onClick={fetchSingleTweet}
           >
-            pull random tweet
+            Pull next tweet
           </button>
 
           <button
-            className="btn btn-mid"
-            onClick={() => navigate("/my-tags")}
+            className={`${styles.btn} ${styles.btnSecondary}`}
+            onClick={() => navigate("/home")}
           >
-            view my tags
-          </button>
-
-          <button
-            className="btn btn-light"
-            onClick={() => navigate("/database")}
-          >
-            view database
+            Back to home
           </button>
         </div>
       </div>
