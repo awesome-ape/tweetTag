@@ -8,7 +8,10 @@ export default function Tweet({ tweet }) {
   return (
     <div className={styles.card}>
       <div className={styles.date}>{date}</div>
-      <div className={styles.content}>{tweet?.content}</div>
+      {/* Scrollable area starts here */}
+      <div className={styles.scrollContainer}>
+        <div className={styles.content}>{tweet?.content}</div>
+      </div>
     </div>
   );
 }
