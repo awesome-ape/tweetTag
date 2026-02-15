@@ -1,110 +1,97 @@
 .page {
   min-height: 100vh;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  padding: 80px 20px;
-  background-color: var(--bg-color);
+  padding: 100px 20px 40px 20px; /* Top padding for header, bottom for breathing room */
 }
 
 .mainWrapper {
   background: var(--card-bg);
   border: 1px solid var(--border-soft);
-  border-radius: 24px;
+  border-radius: 28px;
   padding: 40px;
   box-shadow: var(--shadow-card);
+  width: min(900px, 95vw);
+  /* Removed fixed height and overflow: hidden */
   display: flex;
   flex-direction: column;
-  align-items: center;
-  width: min(1000px, 95vw);
 }
 
 .container {
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 25px;
+  gap: 25px; /* Spacing between tweet and button sections */
 }
 
-/* HEADERS */
-.riskHeaderContainer, .categoryHeaderContainer {
+/* No more internal scrollable area; the whole page scrolls */
+.scrollableContent {
   width: 100%;
-  display: flex;
-  justify-content: flex-start;
 }
 
-.riskTitle, .categoryTitle {
-  font-size: 0.8rem;
+.sectionHeader {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--text-color);
+  opacity: 0.5;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-top: 10px;
+}
+
+.riskActions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.riskBtn {
+  flex: 1;
+  padding: 14px;
+  font-weight: 700;
+  border-radius: 12px !important;
+}
+
+.categoryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.catCard {
+  background: light-dark(rgba(0,0,0,0.03), rgba(255,255,255,0.05));
+  border: 2px solid var(--border-soft);
+  border-radius: 16px;
+  padding: 18px 5px;
+  font-size: 0.85rem;
   font-weight: 700;
   color: var(--text-color);
-  text-transform: uppercase;
-  margin: 0;
-}
-
-/* RISK BUTTONS - FIXED STRETCHING */
-.riskActions {
-  width: 100%;
-  display: flex;
-  justify-content: center; /* Centers the buttons */
-  gap: 1.5rem;
-}
-
-.safe, .danger, .escalate {
-  padding: 10px 30px;
-  min-width: 120px;
-  flex: 0 1 auto; /* Prevents stretching */
-}
-
-.safe { background-color: var(--safe); border-color: var(--safe); }
-.danger { background-color: var(--risk-high); border-color: var(--risk-high); }
-.escalate { background-color: var(--escalate); border-color: var(--escalate); }
-
-/* CIRCULAR CATEGORY BUTTONS */
-.categoryActions {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-}
-
-.oilCircle, .elecCircle, .gasCircle, .otherCircle {
-  width: 85px;
-  height: 85px;
-  border-radius: 50% !important;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 0.85rem;
-  font-weight: 600;
   cursor: pointer;
-  border: none;
-  transition: transform 0.2s, filter 0.2s;
-  padding: 0;
+  transition: all 0.2s ease;
 }
 
-.oilCircle { background-color: var(--cat-oil); color: var(--cat-default-text); }
-.elecCircle { background-color: var(--cat-elec); color: var(--cat-elec-text); }
-.gasCircle { background-color: var(--cat-gas); color: var(--cat-default-text); }
-.otherCircle { background-color: var(--cat-other); color: var(--cat-default-text); }
-
-.oilCircle:hover, .elecCircle:hover, .gasCircle:hover, .otherCircle:hover {
-  transform: scale(1.1);
-  filter: brightness(1.2);
-}
-
-/* NAV */
 .navActions {
   display: flex;
-  gap: 20px;
-  margin-top: 30px;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-soft);
 }
 
-.center {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: var(--text-color);
+.navActions button {
+  flex: 1;
+}
+.safe{
+  background-color: var(--safe);
+  border-color: var(--safe);
+}
+
+.danger{
+  background-color: var(--risk-high);
+  border-color: var(--risk-high);
+}
+.escalate{
+  background-color: var(--escalate);
+  border-color: var(--escalate);
 }

@@ -17,10 +17,7 @@ export default function TweetsPage() {
     setLoading(true);
     setError("");
     const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-      return;
-    }
+    if (!token) { navigate("/login"); return; }
 
     try {
       const res = await fetch(`${serverUrl}/claim_tweet`, {
@@ -37,13 +34,11 @@ export default function TweetsPage() {
     }
   };
 
-  useEffect(() => {
-    fetchSingleTweet();
-  }, []);
+  useEffect(() => { fetchSingleTweet(); }, []);
 
-  const handleTag = (type) => {
-    console.log(`Tagged as: ${type}`);
-  };
+  const handleTag = (type) => console.log(`Tagged as: ${type}`);
+  const submitAndHome = () => navigate("/home");
+  const submitAndNext = () => fetchSingleTweet();
 
   if (loading) return <div className={styles.center}>Loading...</div>;
 
@@ -53,51 +48,43 @@ export default function TweetsPage() {
       
       <div className={styles.mainWrapper}>
         <div className={styles.container}>
-          {error ? (
-            <div className={styles.error}>Error: {error}</div>
-          ) : tweet ? (
-            <Tweet tweet={tweet} />
-          ) : (
-            <p>No tweet available</p>
-          )}
-
-          {/* RISK LEVEL SECTION */}
-          <div className={styles.riskHeaderContainer}>
-            <h3 className={styles.riskTitle}>Risk Level:</h3>
+          
+          {/* ONLY THIS AREA SCROLLS */}
+          <div className={styles.scrollableContent}>
+            {error ? (
+              <div className={styles.error}>Error: {error}</div>
+            ) : tweet ? (
+              <Tweet tweet={tweet} />
+            ) : (
+              <p>No tweet available</p>
+            )}
           </div>
 
-          <div className={styles.riskActions}>
-            <Button className={styles.safe} onClick={() => handleTag("safe")}>Safe</Button>
-            <Button className={styles.danger} onClick={() => handleTag("danger")}>Danger</Button>
-            <Button className={styles.escalate} onClick={() => handleTag("escalate")}>Escalate</Button>
-          </div>
+          <div className={styles.controls}>
+            <div className={styles.sectionHeader}>Risk Assessment</div>
+            <div className={styles.riskActions}>
+              <Button className={`${styles.riskBtn} ${styles.safe}`} onClick={() => handleTag("safe")}>Safe</Button>
+              <Button className={`${styles.riskBtn} ${styles.danger}`} onClick={() => handleTag("danger")}>Danger</Button>
+              <Button className={`${styles.riskBtn} ${styles.escalate}`} onClick={() => handleTag("escalate")}>Escalate</Button>
+            </div>
 
-          {/* CATEGORY SECTION - NOW CIRCULAR BUTTONS */}
-          <div className={styles.categoryHeaderContainer}>
-            <h3 className={styles.categoryTitle}>Category:</h3>
-          </div>
+            <div className={styles.sectionHeader}>Category</div>
+            <div className={styles.categoryGrid}>
+              <button className={`${styles.catCard} ${styles.oil}`} onClick={() => handleTag("oil")}>Oil</button>
+              <button className={`${styles.catCard} ${styles.elec}`} onClick={() => handleTag("electricity")}>Electric</button>
+              <button className={`${styles.catCard} ${styles.gas}`} onClick={() => handleTag("gas")}>Gas</button>
+              <button className={`${styles.catCard} ${styles.other}`} onClick={() => handleTag("unrelated")}>Other</button>
+            </div>
 
-          <div className={styles.categoryActions}>
-            <Button className={styles.oilCircle} onClick={() => handleTag("oil")}>Oil</Button>
-            <Button className={styles.elecCircle} onClick={() => handleTag("electricity")}>Electricity</Button>
-            <Button className={styles.gasCircle} onClick={() => handleTag("gas")}>Gas</Button>
-            <Button className={styles.otherCircle} onClick={() => handleTag("unrelated")}>Other</Button>
+            <div className={styles.navActions}>
+              <Button variant="outline" onClick={() => navigate("/home")}>Back</Button>
+              <Button variant="primary" onClick={submitAndHome}>Submit & Home</Button>
+              <Button variant="primary" onClick={submitAndNext}>Submit & Next</Button>
+            </div>
           </div>
-
-          <div className={styles.navActions}>
-            <Button variant="outline" onClick={() => navigate("/home")}>Back to home</Button>
-             <Button variant="primary" onClick={submitAndHome}>Submit & Back to Home</Button>
-             <Button variant="primary" onClick={submitAndNext}>Submit & Pull next tweet</Button>
-          </div>
+          
         </div>
       </div>
     </div>
   );
 }
-
-
-function submitAndHome(){
-
-}
-
-function submitAndNext(){}
