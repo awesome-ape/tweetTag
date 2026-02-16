@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Tweet from "../../components/Tweet/Tweet.jsx";
 import Header from "../../components/Header/Header.jsx";
@@ -6,7 +6,6 @@ import Button from "../../components/Button/Button.jsx";
 import ErrorModal from "../../components/ErrorModal/ErrorModal.jsx";
 import styles from "./TweetsPage.module.css";
 
-// Define the message constant to ensure strict comparison
 const TIMEOUT_MSG = "You ran out of time to tag this one. Go back home or press X to tag a new one.";
 
 export default function TweetsPage() {
@@ -17,16 +16,15 @@ export default function TweetsPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   
-  // Local state for tagging
   const [isDangerous, setIsDangerous] = useState(null);
   const [category, setCategory] = useState(null);
 
-  // New state to anchor the 10-minute timer to the browser's "now" upon receipt
+  // Anchor for the 10-minute window
   const [receivedAt, setReceivedAt] = useState(null);
 
   const serverUrl = import.meta.env.VITE_SERVER_URL || "http://127.0.0.1:8000";
 
-  const fetchSingleTweet = async () => {
+  const fetchSingleTweet = useCallback(async () => {
     setLoading(true);
     setError("");
     setErrorMsg(null); 
@@ -42,30 +40,34 @@ export default function TweetsPage() {
       
       setTweet(data);
       setTweetid(data._id); 
-      setReceivedAt(Date.now()); // Capture the exact moment the data arrived
       setIsDangerous(null);
       setCategory(null);
+      
+      // START THE CLOCK ONLY ON SUCCESS
+      setReceivedAt(Date.now()); 
     } catch (err) {
       setError(err?.message || "Unknown error");
       setTweet(null);
+      setReceivedAt(null); // Ensure timer doesn't run on error
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate, serverUrl]);
 
   useEffect(() => {
     fetchSingleTweet();
-  }, []);
+  }, [fetchSingleTweet]);
 
-  // Timer logic using the local anchor to prevent "Immediate Timeout" caused by clock skew
+  // Timer Logic
   useEffect(() => {
+    // If we don't have a start time, or an error is already showing, do nothing
     if (!receivedAt || errorMsg) return;
 
     const timerInterval = setInterval(() => {
-      const currentTime = Date.now();
-      const elapsedSeconds = (currentTime - receivedAt) / 1000;
+      const elapsedSeconds = (Date.now() - receivedAt) / 1000;
 
       if (elapsedSeconds > 600) { 
+        setReceivedAt(null); // CRITICAL: Stop the anchor so the timer stops re-triggering
         setErrorMsg(TIMEOUT_MSG);
         clearInterval(timerInterval);
       }
@@ -74,22 +76,16 @@ export default function TweetsPage() {
     return () => clearInterval(timerInterval);
   }, [receivedAt, errorMsg]);
 
-  // Logic to handle "X" button behavior based on the type of error
   const handleCloseModal = () => {
     if (errorMsg === TIMEOUT_MSG) {
-      fetchSingleTweet(); // Fetch new tweet if timed out
+      fetchSingleTweet(); 
     } else {
-      setErrorMsg(null); // Just close for validation errors (like "Tag the tweet first")
+      setErrorMsg(null); 
     }
   };
 
-  const setDanger = (bool) => {
-    setIsDangerous(prev => (prev === bool ? null : bool));
-  };
-
-  const handleCategory = (cat) => {
-    setCategory(prev => (prev === cat ? null : cat));
-  };
+  const setDanger = (bool) => setIsDangerous(prev => (prev === bool ? null : bool));
+  const handleCategory = (cat) => setCategory(prev => (prev === cat ? null : cat));
 
   const submit = async () => {
     if (isDangerous === null || !category) {
@@ -102,13 +98,6 @@ export default function TweetsPage() {
       return false;
     }
 
-    const payload = {
-      tweet_id: tweetid,
-      locked_at: tweet.locked_at, // Send original server timestamp back for DB verification
-      category: category,
-      is_dangerous: isDangerous,
-    };
-
     try {
       const response = await fetch(`${serverUrl}/submit_tagged_tweet`, {
         method: "POST",
@@ -116,7 +105,12 @@ export default function TweetsPage() {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${localStorage.getItem("token")}`
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+          tweet_id: tweetid,
+          locked_at: tweet.locked_at,
+          category,
+          is_dangerous: isDangerous,
+        })
       });
 
       if (!response.ok) {
@@ -131,16 +125,11 @@ export default function TweetsPage() {
     }
   };
 
-  const submitAndHome = async () => {
-    if (await submit()) navigate("/home");
-  };
-
-  const submitAndNext = async () => {
-    if (await submit()) fetchSingleTweet();
-  };
+  const submitAndHome = async () => { if (await submit()) navigate("/home"); };
+  const submitAndNext = async () => { if (await submit()) fetchSingleTweet(); };
 
   const escalate = async () => {
-    if (!tweet || !tweetid) return;
+    if (!tweetid) return;
     try {
       const response = await fetch(`${serverUrl}/escalate_tweet`, {
         method: "POST",
@@ -150,15 +139,12 @@ export default function TweetsPage() {
         },
         body: JSON.stringify({ tweet_id: tweetid, locked_at: tweet.locked_at })
       });
-      if (response.ok) {
-        fetchSingleTweet();
-      } else {
+      if (response.ok) fetchSingleTweet();
+      else {
         const data = await response.json();
         setErrorMsg(data.detail || "Escalation failed");
       }
-    } catch (err) {
-      setErrorMsg(err.message);
-    }
+    } catch (err) { setErrorMsg(err.message); }
   };
 
   if (loading) return <div className={styles.center}>Loading...</div>;
@@ -166,7 +152,6 @@ export default function TweetsPage() {
   return (
     <div className={styles.page}>
       <Header />
-      {/* Use the new handleCloseModal function here */}
       {errorMsg && <ErrorModal message={errorMsg} onClose={handleCloseModal} />}
 
       <div className={styles.mainWrapper}>
