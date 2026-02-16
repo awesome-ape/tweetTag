@@ -3,7 +3,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 100px 20px 40px 20px; /* Top padding for header, bottom for breathing room */
+  padding: 100px 20px 40px 20px;
 }
 
 .mainWrapper {
@@ -13,7 +13,6 @@
   padding: 40px;
   box-shadow: var(--shadow-card);
   width: min(900px, 95vw);
-  /* Removed fixed height and overflow: hidden */
   display: flex;
   flex-direction: column;
 }
@@ -22,10 +21,9 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 25px; /* Spacing between tweet and button sections */
+  gap: 25px;
 }
 
-/* No more internal scrollable area; the whole page scrolls */
 .scrollableContent {
   width: 100%;
 }
@@ -51,6 +49,8 @@
   padding: 14px;
   font-weight: 700;
   border-radius: 12px !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .categoryGrid {
@@ -71,6 +71,15 @@
   transition: all 0.2s ease;
 }
 
+/* Highlighted state */
+.active {
+  background-color: var(--selected-cat-bg) !important;
+  color: var(--selected-cat-text) !important;
+  border-color: var(--selected-cat-bg) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
 .navActions {
   display: flex;
   gap: 12px;
@@ -82,16 +91,21 @@
 .navActions button {
   flex: 1;
 }
-.safe{
+
+.safe {
   background-color: var(--safe);
   border-color: var(--safe);
+  color: white;
 }
 
-.danger{
+.danger {
   background-color: var(--risk-high);
   border-color: var(--risk-high);
+  color: white;
 }
-.escalate{
+
+.escalate {
   background-color: var(--escalate);
   border-color: var(--escalate);
+  color: white;
 }
