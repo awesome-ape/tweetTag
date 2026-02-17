@@ -1,11 +1,43 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-// 1. Change the import to a module import
 import styles from "./Header.module.css"; 
 
 export default function Header() {
   const navigate = useNavigate();
-  const username = localStorage.getItem("username") || "User";
+  // 1. Setup state for the data we're fetching
+  const [headerData, setHeaderData] = useState({ username: "Loading...", processed_count: 0 });
+
+  useEffect(() => {
+    const fetchHeaderData = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+
+      try {
+        const serverUrl = import.meta.env.VITE_SERVER_URL || "http://127.0.0.1:8000";
+        const endpoint = "/get_header_data";
+        
+        // Added backticks ` ` for the template literal
+        const res = await fetch(`${serverUrl}${endpoint}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        const data = await res.json(); // Added () to .json()
+        
+        if (res.ok) {
+          setHeaderData(data);
+        } else {
+          console.error("Failed to fetch header data");
+        }
+      } catch (err) {
+        console.error("Header fetch error:", err);
+      }
+    };
+
+    fetchHeaderData();
+  }, [navigate]); // Runs once on mount
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -14,7 +46,6 @@ export default function Header() {
   };
 
   return (
-    /* 2. Use styles.className instead of a string */
     <header className={styles.mainHeader}>
       <div 
         className={styles.navLeft} 
@@ -25,7 +56,9 @@ export default function Header() {
       </div>
 
       <div className={styles.navRight}>
-        <span className={styles.username}>👤 {username}</span>
+        {/* 2. Display the count and username from state */}
+        <span className={styles.countBadge}>✅tagged: {headerData.processed_count}</span>
+        <span className={styles.username}>👤 {headerData.username}</span>
         <button className={styles.logoutBtn} onClick={handleLogout}>
           Logout
         </button>
