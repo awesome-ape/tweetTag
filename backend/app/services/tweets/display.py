@@ -1,10 +1,12 @@
 import asyncio
+from bson import ObjectId
 from unittest import result
 from backend.app.db.database import (
     backup_collection,
     escalation_collection,
     working_collection,
     processed_collection,
+    users_collection,
 )
 from backend.app.schemas.tweet_scheme import TweetinDB
 from typing import List
@@ -88,3 +90,31 @@ async def get_leaderboard() -> List[Dict]:
     results = await cursor.to_list(length=None)
 
     return results
+
+
+async def get_header_data(user_id: str) -> Dict:
+    try:
+        # 1. Count processed tweets (using string ID as stored in tagged_by)
+        uid_string = str(user_id).strip()
+        print(f"DEBUG: Variable value is '{uid_string}'")
+        processed_count = await processed_collection.count_documents(
+            {"tagged_by": uid_string}
+        )
+
+        # 2. Look up the username (converting string to ObjectId for the users table)
+        # We only include the 'username' field and exclude '_id'
+        user_doc = await users_collection.find_one(
+            {"_id": ObjectId(user_id)}, {"username": 1, "_id": 0}
+        )
+
+        if not user_doc:
+            return {"username": "Unknown", "processed_count": processed_count}
+
+        return {
+            "username": user_doc.get("username"),
+            "processed_count": processed_count,
+        }
+
+    except Exception as e:
+        print(f"Error in get_header_data: {e}")
+        return {"username": "Error", "processed_count": 0}

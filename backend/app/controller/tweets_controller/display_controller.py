@@ -35,3 +35,12 @@ async def get_tagging_leaderboaard(current_user=Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="Forbidden: Admins only")
     leaderboard = await display.get_leaderboard()
     return leaderboard
+
+
+@router.get("/get_header_data")
+async def get_header_data(current_user=Depends(get_current_user)):
+    user_id = current_user.get("_id")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    data = await display.get_header_data(user_id)
+    return data
