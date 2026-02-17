@@ -1,30 +1,16 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import Header from "../../components/Header/Header.jsx"; // Adjust this path if needed
 import styles from "./Home.module.css";
 
 export default function Home() {
   const navigate = useNavigate();
   const username = localStorage.getItem("username") || "User";
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("username");
-    navigate("/login");
-  };
-
   return (
     <div className={styles.page}>
-      {/* ====== NAVBAR ====== */}
-      <div className={styles.navbar}>
-        <div className={styles.navLeft}>TweetTag #</div>
-
-        <div className={styles.navRight}>
-          <span className={styles.username}>👤 {username}</span>
-          <button className={styles.logoutBtn} onClick={handleLogout}>
-            Logout
-          </button>
-        </div>
-      </div>
+      {/* ====== HEADER COMPONENT ====== */}
+      <Header />
 
       {/* רקע */}
       <div className={styles.bg} />
