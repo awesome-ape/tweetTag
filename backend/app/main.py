@@ -27,7 +27,9 @@ async def lifespan(app: FastAPI):
         await connect_to_mongo()
         print("MongoDB connected successfully.")
         cleanup_task = asyncio.create_task(release_stale_locks(working_collection))
-        cleanup_task = asyncio.create_task(release_stale_locks(escalation_collection))
+        cleanup_esclation_task = asyncio.create_task(
+            release_stale_locks(escalation_collection)
+        )
     except Exception as e:
         print(f"Error connecting to MongoDB: {e}")
         raise e

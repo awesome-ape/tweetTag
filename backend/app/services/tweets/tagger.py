@@ -134,3 +134,15 @@ async def release_stale_locks(collection):
             print(f"✅ SUCCESS: Released {result.modified_count} stale tweets.")
 
         await asyncio.sleep(60)
+
+
+async def release_tweet(id, collection):
+    result = await collection.update_one(
+        {"_id": ObjectId(id)}, {"$set": {"status": "pending", "locked_at": None}}
+    )
+    if result.matched_count > 0:
+        print(f"✅ SUCCESS: Released stale tweets.")
+        return True
+    else:
+        print(f"failed to find tweet")
+        return False
