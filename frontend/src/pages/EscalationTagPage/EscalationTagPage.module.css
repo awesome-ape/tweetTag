@@ -1,0 +1,128 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 100px 20px 40px 20px;
+  background: transparent;
+  color: var(--text-color);
+}
+
+.mainWrapper {
+  background: var(--card-bg);
+  border: 1px solid var(--border-soft);
+  border-radius: 28px;
+  padding: 40px;
+  box-shadow: var(--shadow-card);
+  width: min(900px, 95vw);
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.scrollableContent {
+  width: 100%;
+}
+
+.sectionHeader {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--text-color);
+  opacity: 0.5;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-top: 10px;
+}
+
+.riskActions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+/* keep this generic; colors come from .safe/.danger/.escalate or your button component */
+.riskBtn {
+  flex: 1;
+  padding: 14px;
+  font-weight: 700;
+  border-radius: 12px !important;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.riskBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-card);
+}
+
+.categoryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.catCard {
+  /* mimic the light surface tint using existing vars */
+  background: var(--overlay);
+  border: 2px solid var(--border-soft);
+  border-radius: 16px;
+  padding: 18px 5px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-color);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.catCard:hover {
+  transform: translateY(-2px);
+  border-color: var(--selected-cat-bg);
+  box-shadow: var(--shadow-card);
+}
+
+/* Highlighted state */
+.active {
+  background: var(--selected-cat-bg) !important;
+  color: var(--selected-cat-text) !important;
+  border-color: var(--selected-cat-bg) !important;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card);
+}
+
+/* nav actions row */
+.navActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.navActions button {
+  flex: 1;
+}
+
+/* risk buttons colors */
+.safe {
+  background: var(--safe);
+  border-color: var(--safe);
+  color: var(--btn-text);
+}
+
+.danger {
+  background: var(--risk-high);
+  border-color: var(--risk-high);
+  color: var(--btn-text);
+}
+
+.escalate {
+  background: var(--escalate);
+  border-color: var(--escalate);
+  color: var(--btn-text);
+}

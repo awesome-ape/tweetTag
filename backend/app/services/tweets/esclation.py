@@ -1,66 +1,83 @@
-import asyncio
-from unittest import result
-from backend.app.db.database import (
-    backup_collection,
-    escalation_collection,
-    working_collection,
-    processed_collection,
-)
-from backend.app.schemas.tweet_scheme import (
-    TweetinDB,
-    TweetSchema,
-    taggSchema,
-    esclateSchema,
-)
-from typing import List
-from datetime import datetime, timedelta, timezone
-from dotenv import load_dotenv
 import os
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from pymongo import ReturnDocument
+from typing import List, Optional
+
 from bson import ObjectId
-from backend.app.services.tweets.tagger import claim_tweet, submit_tagged_tweet
-from backend.app.services.users.users import is_admin
+from dotenv import load_dotenv
+from pymongo import ReturnDocument
+
+from backend.app.db.database import escalation_collection
+from backend.app.schemas.tweet_scheme import TweetinDB, taggSchema
+from backend.app.services.tweets.tagger import submit_tagged_tweet, release_lock
 
 base_dir = Path(__file__).resolve().parent.parent.parent.parent
 load_dotenv(dotenv_path=base_dir / ".env")
 
 
-async def get_escalated_tweets() -> List[TweetinDB]:
-    tweets_data = escalation_collection.find({})
-    tweets = []
-    async for tweet_data in tweets_data:
-        tweet = TweetinDB.from_mongo(tweet_data)
-        if tweet:
-            tweet.append(tweet)
+def _now_utc() -> datetime:
+    return datetime.now(timezone.utc)
+
+
+def _timeout_seconds() -> int:
+    return int(os.getenv("TIMEOUT_LIMIT", "300"))
+
+
+async def get_escalated_tweets(limit: int = 200) -> List[TweetinDB]:
+    # Better sorting: queued_at if exists, else _id
+    cursor = escalation_collection.find({}).sort([("queued_at", -1), ("_id", -1)]).limit(limit)
+
+    tweets: List[TweetinDB] = []
+    async for doc in cursor:
+        t = TweetinDB.from_mongo(doc)
+        if t:
+            tweets.append(t)
     return tweets
 
 
-async def claim_escalated_tweet(tweet_id: str) -> TweetinDB | None:
-    timeout_limit = int(os.getenv("TIMEOUT_LIMIT", "300"))
-    expiry_time = datetime.now(timezone.utc) - timedelta(seconds=timeout_limit)
+async def claim_escalated_tweet(tweet_id: str, user_id: str) -> Optional[TweetinDB]:
+    try:
+        oid = ObjectId(str(tweet_id))
+    except Exception:
+        return None
 
-    # 1. Fixed syntax: Added () and converted to ObjectId
-    # 2. Used 'escalation_collection' specifically
+    expiry_time = _now_utc() - timedelta(seconds=_timeout_seconds())
+
     query = {
-        "_id": ObjectId(tweet_id),
+        "_id": oid,
         "$or": [
+            {"status": {"$exists": False}},
+            {"status": None},
             {"status": "pending"},
+
+            # reclaim by same admin
+            {"status": "tagging", "locked_by": str(user_id)},
+
+            # stale/invalid locks
             {"status": "tagging", "locked_at": {"$lt": expiry_time}},
+            {"status": "tagging", "locked_at": {"$exists": False}},
+            {"status": "tagging", "locked_at": None},
         ],
     }
 
-    update = {"$set": {"status": "tagging", "locked_at": datetime.now(timezone.utc)}}
+    update = {
+        "$set": {
+            "status": "tagging",
+            "locked_at": _now_utc(),
+            "locked_by": str(user_id),
+        }
+    }
 
-    # Use the escalation_collection directly here
-    tweet_data = await escalation_collection.find_one_and_update(
-        query, update, return_document=ReturnDocument.AFTER
+    doc = await escalation_collection.find_one_and_update(
+        query,
+        update,
+        return_document=ReturnDocument.AFTER,
     )
+    return TweetinDB.from_mongo(doc) if doc else None
 
-    if not tweet_data:
-        return None
 
-    return TweetinDB.from_mongo(tweet_data)
+async def release_escalated_lock(tweet_id: str, user_id: str) -> bool:
+    return await release_lock(tweet_id, user_id, escalation_collection)
 
 
 async def submit_escalated_tagged_tweet(payload: taggSchema) -> bool:
