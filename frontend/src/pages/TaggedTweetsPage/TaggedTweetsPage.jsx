@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header/Header.jsx";
 import TaggedTweetCard from "../../components/TaggedTweetCard/TaggedTweetCard.jsx";
-// Import styles
 import styles from "./TaggedTweetsPage.module.css";
 
 function isTaggedTweet(t) {
@@ -14,24 +13,37 @@ function isTaggedTweet(t) {
   return false;
 }
 
+// show a window of pages around current page
+function getPageWindow(current, total, windowSize = 7) {
+  if (!total || total <= 1) return [1];
+  const half = Math.floor(windowSize / 2);
+
+  let start = Math.max(1, current - half);
+  let end = Math.min(total, start + windowSize - 1);
+  start = Math.max(1, end - windowSize + 1);
+
+  const pages = [];
+  for (let p = start; p <= end; p++) pages.push(p);
+  return pages;
+}
+
 export default function TaggedTweetsPage() {
   const navigate = useNavigate();
 
   const [rawItems, setRawItems] = useState([]);
   const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   const serverUrl = import.meta.env.VITE_SERVER_URL || "http://127.0.0.1:8000";
 
-  // ✅ REDIRECT LOGIC
   const handleEditClick = (tweet) => {
-    // If the tweet is already being tagged by someone else, don't redirect
     if (tweet.status === "tagging") {
-       alert("This tweet is currently being edited by another admin.");
-       return;
+      alert("This tweet is currently being edited by another admin.");
+      return;
     }
-    // Pass the tweet object to the editor page via state
     navigate("/edit-tweet", { state: { tweet } });
   };
 
@@ -63,7 +75,12 @@ export default function TaggedTweetsPage() {
         return;
       }
 
-      setRawItems(Array.isArray(data) ? data : []);
+      // ✅ expects { items, totalPages, ... }
+      const items = Array.isArray(data?.items) ? data.items : [];
+      setRawItems(items);
+
+      const tp = Number.isFinite(data?.totalPages) ? data.totalPages : 1;
+      setTotalPages(Math.max(1, tp));
     } catch (e) {
       setError("Network error while fetching tweets");
     } finally {
@@ -87,6 +104,11 @@ export default function TaggedTweetsPage() {
       })
       .filter(isTaggedTweet);
   }, [rawItems]);
+
+  const pageNumbers = useMemo(
+    () => getPageWindow(page, totalPages, 7),
+    [page, totalPages]
+  );
 
   return (
     <div className={styles.page}>
@@ -116,20 +138,20 @@ export default function TaggedTweetsPage() {
           <div className={styles.list}>
             {taggedTweets.map((tweet, idx) => {
               const isLocked = tweet.status === "tagging";
-              
+
               return (
-                <div 
-                  key={tweet?._id || tweet?.id || idx} 
-                  className={`${styles.item} ${isLocked ? styles.lockedItem : ""}`}
+                <div
+                  key={tweet?._id || tweet?.id || idx}
+                  className={`${styles.item} ${
+                    isLocked ? styles.lockedItem : ""
+                  }`}
                   onClick={() => handleEditClick(tweet)}
-                  style={{ 
+                  style={{
                     cursor: isLocked ? "not-allowed" : "pointer",
-                    position: "relative" 
+                    position: "relative",
                   }}
                 >
                   <TaggedTweetCard tweet={tweet} />
-                  
-                  {/* Visual indicator if locked */}
                   {isLocked && (
                     <div className={styles.lockOverlay}>
                       <span>🔒 Being Edited</span>
@@ -141,6 +163,7 @@ export default function TaggedTweetsPage() {
           </div>
         )}
 
+        {/* ✅ Pagination with numbers */}
         <div className={styles.pagination}>
           <button
             className={`${styles.btn} ${styles.btnLight}`}
@@ -149,14 +172,65 @@ export default function TaggedTweetsPage() {
           >
             prev
           </button>
-          <span className={styles.pageLabel}>page {page}</span>
+
+          <div className={styles.pageNumbers}>
+            <button
+              className={`${styles.pageBtn} ${
+                page === 1 ? styles.activePage : ""
+              }`}
+              onClick={() => setPage(1)}
+              disabled={loading}
+            >
+              1
+            </button>
+
+            {pageNumbers[0] > 2 && (
+              <span className={styles.ellipsis}>…</span>
+            )}
+
+            {pageNumbers
+              .filter((p) => p !== 1 && p !== totalPages)
+              .map((p) => (
+                <button
+                  key={p}
+                  className={`${styles.pageBtn} ${
+                    page === p ? styles.activePage : ""
+                  }`}
+                  onClick={() => setPage(p)}
+                  disabled={loading}
+                >
+                  {p}
+                </button>
+              ))}
+
+            {pageNumbers[pageNumbers.length - 1] < totalPages - 1 && (
+              <span className={styles.ellipsis}>…</span>
+            )}
+
+            {totalPages > 1 && (
+              <button
+                className={`${styles.pageBtn} ${
+                  page === totalPages ? styles.activePage : ""
+                }`}
+                onClick={() => setPage(totalPages)}
+                disabled={loading}
+              >
+                {totalPages}
+              </button>
+            )}
+          </div>
+
           <button
             className={`${styles.btn} ${styles.btnLight}`}
-            onClick={() => setPage((p) => p + 1)}
-            disabled={loading || rawItems.length === 0}
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={loading || page >= totalPages}
           >
             next
           </button>
+
+          <span className={styles.pageLabel}>
+            page {page} / {totalPages}
+          </span>
         </div>
       </div>
     </div>

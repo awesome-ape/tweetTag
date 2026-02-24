@@ -57,7 +57,7 @@ export default function EscalatedTweetsPage() {
 
   const handleClickTweet = (tweet) => {
     navigate("/escalation-tag", {
-      state: { tweet }, // ✅ זה כל מה שצריך להעביר
+      state: { tweet }, 
     });
   };
 

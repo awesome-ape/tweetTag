@@ -18,7 +18,7 @@ class TweetSchema(BaseModel):
 class TweetinDB(TweetSchema):
     status: str = "pending"
     locked_at: Optional[datetime] = None
-    locked_by: Optional[str] = None  # ✅ NEW
+    locked_by: Optional[str] = None
     tagged_by: Optional[str] = None
     is_dangerous: Optional[bool] = None
     category: Optional[str] = None
@@ -57,8 +57,9 @@ class taggSchemaFront(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
+# ✅ FIXED: locked_at is optional for release
 class esclateSchema(BaseModel):
     tweet_id: str
-    locked_at: datetime
+    locked_at: Optional[datetime] = None
 
     model_config = ConfigDict(arbitrary_types_allowed=True)

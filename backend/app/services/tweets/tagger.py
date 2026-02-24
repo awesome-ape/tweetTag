@@ -2,12 +2,12 @@ import asyncio
 import os
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List
 
 from bson import ObjectId
 from dotenv import load_dotenv
 from pymongo import ReturnDocument
-from typing import List
+
 from backend.app.db.database import (
     escalation_collection,
     processed_collection,
@@ -27,14 +27,25 @@ def _timeout_seconds() -> int:
     return int(os.getenv("TIMEOUT_LIMIT", "300"))
 
 
+def _expiry_time() -> datetime:
+    return _now_utc() - timedelta(seconds=_timeout_seconds())
+
+
 async def claim_tweet(collection, user_id: str) -> Optional[TweetinDB]:
-    expiry_time = _now_utc() - timedelta(seconds=_timeout_seconds())
+    """
+    Claim ONE tweet for tagging.
+    We only allow claiming tweets that are:
+    - pending / status missing / status None
+    - OR tagging but stale/invalid lock
+    """
+    expiry_time = _expiry_time()
 
     query = {
         "$or": [
-            {"status": {"$ne": "tagging"}},
             {"status": {"$exists": False}},
             {"status": None},
+            {"status": "pending"},
+
             # stale/invalid locks
             {"status": "tagging", "locked_at": {"$lt": expiry_time}},
             {"status": "tagging", "locked_at": {"$exists": False}},
@@ -68,7 +79,7 @@ async def submit_tagged_tweet(payload: taggSchema, collection) -> bool:
     except Exception:
         raise ValueError("Submission failed: invalid tweet id.")
 
-    # 1. Verify ownership and lock status
+    # Verify ownership + lock validity (locked_at must match!)
     query = {
         "_id": oid,
         "status": "tagging",
@@ -86,7 +97,6 @@ async def submit_tagged_tweet(payload: taggSchema, collection) -> bool:
         "$unset": {"locked_at": "", "locked_by": ""},
     }
 
-    # Execute the update in the source collection
     tweet = await collection.find_one_and_update(
         query,
         update,
@@ -94,51 +104,78 @@ async def submit_tagged_tweet(payload: taggSchema, collection) -> bool:
     )
 
     if not tweet:
-        raise ValueError(
-            "Submission failed: lock invalid / expired / not owned by user."
-        )
+        raise ValueError("Submission failed: lock invalid / expired / not owned by user.")
 
-    # 2. Handle the "Move or Update" logic
-    # If we are NOT in processed yet, move it there and delete the original
+    # Move to processed if coming from working (upsert prevents DuplicateKey)
     if collection != processed_collection:
-        # replace_one with upsert=True prevents DuplicateKey errors if it exists
-        await processed_collection.replace_one(
-            {"_id": tweet["_id"]}, tweet, upsert=True
-        )
+        await processed_collection.replace_one({"_id": tweet["_id"]}, tweet, upsert=True)
         await collection.delete_one({"_id": tweet["_id"]})
-
-    # If we ARE already in processed_collection, find_one_and_update
-    # already saved the changes. We are done.
 
     return True
 
 
 async def release_lock(tweet_id: str, user_id: str, collection) -> bool:
-    if collection == processed_collection:
-        stat = "tagged"
-    else:
-        stat = "pending"
+    """
+    Idempotent unlock.
+
+    - If the tweet is locked by THIS user, we remove the lock.
+    - If it's not locked / not owned / already moved / not found: we return True
+      (so frontend doesn't get stuck and locks won't accumulate).
+
+    We ONLY change status back to default if current status is "tagging".
+    Otherwise, we just unset the lock fields safely.
+    """
     try:
         oid = ObjectId(str(tweet_id))
     except Exception:
-        return False
+        # invalid id -> treat as "nothing to release" for UX
+        return True
 
-    res = await collection.update_one(
-        {"_id": oid, "status": "tagging", "locked_by": str(user_id)},
-        {"$set": {"status": stat}, "$unset": {"locked_at": "", "locked_by": ""}},
+    default_status = "tagged" if collection == processed_collection else "pending"
+
+    doc = await collection.find_one(
+        {"_id": oid},
+        {"status": 1, "locked_by": 1, "locked_at": 1},
     )
-    return res.modified_count == 1
+
+    # Already gone -> nothing to release
+    if not doc:
+        return True
+
+    # Locked by someone else or not locked -> don't fail UX
+    if doc.get("locked_by") != str(user_id):
+        return True
+
+    # If it's tagging, revert status and clear lock
+    if doc.get("status") == "tagging":
+        await collection.update_one(
+            {"_id": oid, "locked_by": str(user_id)},
+            {
+                "$set": {"status": default_status},
+                "$unset": {"locked_at": "", "locked_by": ""},
+            },
+        )
+        return True
+
+    # Otherwise just clear lock fields (safe)
+    await collection.update_one(
+        {"_id": oid, "locked_by": str(user_id)},
+        {"$unset": {"locked_at": "", "locked_by": ""}},
+    )
+    return True
 
 
 async def escalate_tweet(payload: esclateSchema, user_id: str) -> bool:
     """
-    payload has: tweet_id, locked_at (per your schema)
-    user_id comes from current_user (server-side), not from payload.
+    Escalation requires a valid lock (locked_at must match).
     """
     try:
         oid = ObjectId(str(payload.tweet_id))
     except Exception:
         raise ValueError("Escalation failed: invalid tweet id.")
+
+    if payload.locked_at is None:
+        raise ValueError("Escalation failed: missing locked_at.")
 
     query = {
         "_id": oid,
@@ -149,15 +186,11 @@ async def escalate_tweet(payload: esclateSchema, user_id: str) -> bool:
 
     tweet = await working_collection.find_one(query)
     if not tweet:
-        raise ValueError(
-            "Escalation failed: lock invalid / expired / not owned by user."
-        )
+        raise ValueError("Escalation failed: lock invalid / expired / not owned by user.")
 
     tweet["status"] = "pending"
     tweet.pop("locked_at", None)
     tweet.pop("locked_by", None)
-
-    # Optional but recommended for sorting in admin queue:
     tweet["queued_at"] = _now_utc()
 
     await escalation_collection.insert_one(tweet)
@@ -166,13 +199,13 @@ async def escalate_tweet(payload: esclateSchema, user_id: str) -> bool:
 
 
 async def release_stale_locks(collection) -> None:
-    timeout_limit = _timeout_seconds()
-    stat = "pending"
-    if collection == processed_collection:
-        stat = "tagged"
+    """
+    Background job to release stale locks.
+    """
+    stat = "tagged" if collection == processed_collection else "pending"
 
     while True:
-        cutoff_time = _now_utc() - timedelta(seconds=timeout_limit)
+        cutoff_time = _expiry_time()
 
         result = await collection.update_many(
             {
@@ -195,14 +228,7 @@ async def release_stale_locks(collection) -> None:
         await asyncio.sleep(60)
 
 
-from typing import List
-
-
 async def get_my_tagged_tweets(user_id: str, limit: int = 200) -> List[TweetinDB]:
-    """
-    Returns tweets from processed_collection that were tagged
-    by the currently authenticated user.
-    """
     cursor = (
         processed_collection.find({"tagged_by": str(user_id)})
         .sort([("_id", -1)])
@@ -224,7 +250,7 @@ async def claim_processed_tweet(tweet_id: str, user_id: str) -> Optional[Tweetin
     except Exception:
         return None
 
-    expiry_time = _now_utc() - timedelta(seconds=_timeout_seconds())
+    expiry_time = _expiry_time()
 
     query = {
         "_id": oid,
@@ -233,8 +259,10 @@ async def claim_processed_tweet(tweet_id: str, user_id: str) -> Optional[Tweetin
             {"status": None},
             {"status": "pending"},
             {"status": "tagged"},
+
             # reclaim by same admin
             {"status": "tagging", "locked_by": str(user_id)},
+
             # stale/invalid locks
             {"status": "tagging", "locked_at": {"$lt": expiry_time}},
             {"status": "tagging", "locked_at": {"$exists": False}},

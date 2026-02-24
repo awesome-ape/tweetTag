@@ -5,53 +5,55 @@ import styles from "./Home.module.css";
 
 export default function Home() {
   const navigate = useNavigate();
+
+  const token = localStorage.getItem("token");
   const username = localStorage.getItem("username") || "User";
 
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [loading, setLoading] = useState(true);
+  // ✅ show instantly from localStorage (set on login)
+  const [isAdmin, setIsAdmin] = useState(
+    localStorage.getItem("isADMIN") === "true"
+  );
 
+  // ✅ no loading screen; we can still "refresh" silently in background
   useEffect(() => {
-    const fetchIsAdmin = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        navigate("/login");
-        return;
-      }
+    if (!token) {
+      navigate("/login");
+      return;
+    }
 
+    const serverUrl = import.meta.env.VITE_SERVER_URL || "http://127.0.0.1:8000";
+
+    // optional: silent refresh so localStorage stays correct
+    const refreshAdmin = async () => {
       try {
-        const serverUrl =
-          import.meta.env.VITE_SERVER_URL || "http://127.0.0.1:8000";
-
         const res = await fetch(`${serverUrl}/get_header_data`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        const data = await res.json();
+        const data = await res.json().catch(() => ({}));
 
         if (res.ok) {
-          setIsAdmin(Boolean(data.isADMIN));
+          const admin = Boolean(data.isADMIN);
+          setIsAdmin(admin);
+          localStorage.setItem("isADMIN", String(admin));
         } else if (res.status === 401) {
           localStorage.removeItem("token");
           localStorage.removeItem("username");
+          localStorage.removeItem("isADMIN");
           navigate("/login");
-        } else {
-          setIsAdmin(false);
         }
       } catch (err) {
-        console.error("Failed to fetch admin status:", err);
-        setIsAdmin(false);
-      } finally {
-        setLoading(false);
+        // don't block UI on network errors
+        console.error("Failed to refresh admin status:", err);
       }
     };
 
-    fetchIsAdmin();
-  }, [navigate]);
+    refreshAdmin();
+  }, [navigate, token]);
 
   return (
     <div className={styles.page}>
       <Header />
-
       <div className={styles.bg} />
 
       <div className={styles.container}>
@@ -73,13 +75,13 @@ export default function Home() {
             view my tags
           </button>
 
-          {}
-          {!loading && isAdmin && (
+          {isAdmin && (
             <>
               <button
-               className={`${styles.btn} ${styles.btnLight}`}
-                onClick={() => navigate("/tagged-tweets")} >
-             view database
+                className={`${styles.btn} ${styles.btnLight}`}
+                onClick={() => navigate("/tagged-tweets")}
+              >
+                view database
               </button>
 
               <button
@@ -88,6 +90,7 @@ export default function Home() {
               >
                 tag escalated tweets
               </button>
+
               <button
                 className={`${styles.btn} ${styles.btnLight}`}
                 onClick={() => navigate("/table")}

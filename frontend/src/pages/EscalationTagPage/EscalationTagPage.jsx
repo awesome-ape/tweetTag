@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Header from "../../components/Header/Header.jsx";
 import Button from "../../components/Button/Button.jsx";
@@ -43,11 +43,9 @@ function EscalationTweet({ tweet }) {
 export default function EscalationTagPage() {
   const navigate = useNavigate();
   const location = useLocation();
-
   const passedTweet = location.state?.tweet || null;
 
   const [errorMsg, setErrorMsg] = useState(null);
-  const [tweetId, setTweetId] = useState(null);
   const [tweet, setTweet] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -59,24 +57,45 @@ export default function EscalationTagPage() {
 
   const serverUrl = import.meta.env.VITE_SERVER_URL || "http://127.0.0.1:8000";
 
-  const releaseEscalationLock = useCallback(
-    async (id) => {
-      if (!id) return;
-      try {
-        await fetch(`${serverUrl}/release_escalated_tweet_lock`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify({ tweet_id: id }),
-        });
-      } catch (e) {
-        console.warn("releaseEscalationLock failed:", e);
+  // ✅ stable refs (avoid hook loops + keep last lock info)
+  const tweetIdRef = useRef(null);
+  const lockedAtRef = useRef(null);
+  const isReleasingRef = useRef(false); // prevent concurrent release spam
+  const initialClaimDoneRef = useRef(false);
+
+  const releaseEscalationLock = useCallback(async () => {
+    const id = tweetIdRef.current;
+    if (!id) return;
+
+    if (isReleasingRef.current) return; // prevent spamming
+    isReleasingRef.current = true;
+
+    try {
+      const payload = { tweet_id: id };
+
+      // ✅ send locked_at only if we have it (schema now allows optional)
+      if (lockedAtRef.current) payload.locked_at = lockedAtRef.current;
+
+      const res = await fetch(`${serverUrl}/release_escalated_lock`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      // If backend returns 400 because it was already released / not locked, don't spam errors
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        console.warn("releaseEscalationLock:", res.status, data?.detail || "failed");
       }
-    },
-    [serverUrl]
-  );
+    } catch (e) {
+      console.warn("releaseEscalationLock failed:", e);
+    } finally {
+      isReleasingRef.current = false;
+    }
+  }, [serverUrl]);
 
   const claimEscalated = useCallback(
     async (id) => {
@@ -90,68 +109,72 @@ export default function EscalationTagPage() {
         return;
       }
 
-      // ✅ אם היה ציוץ קודם נעול אצלך (באותו עמוד), תשחררי לפני claim חדש
-      if (tweetId && tweetId !== id) {
-        await releaseEscalationLock(tweetId);
-      }
-
       try {
         const res = await fetch(
           `${serverUrl}/claim_escalated_tweet?tweet_id=${encodeURIComponent(id)}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
 
         const data = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(data?.detail || "Failed to claim tweet");
 
         setTweet(data);
-        setTweetId(data._id || data.id);
+
+        tweetIdRef.current = data._id || data.id || null;
+        lockedAtRef.current = data.locked_at || null;
 
         setIsDangerous(null);
         setCategory(null);
-
         setReceivedAt(Date.now());
       } catch (err) {
         setError(err?.message || "Unknown error");
         setTweet(null);
-        setTweetId(null);
+        tweetIdRef.current = null;
+        lockedAtRef.current = null;
         setReceivedAt(null);
       } finally {
         setLoading(false);
       }
     },
-    [navigate, serverUrl, tweetId, releaseEscalationLock]
+    [navigate, serverUrl]
   );
 
+  // ✅ initial claim once (prevents double-claim loops)
   useEffect(() => {
     const id = passedTweet?._id || passedTweet?.id;
     if (!id) {
       navigate("/escalation");
       return;
     }
+    if (initialClaimDoneRef.current) return;
+    initialClaimDoneRef.current = true;
+
     claimEscalated(id);
   }, [passedTweet, claimEscalated, navigate]);
 
-  // ✅ release lock on unmount (עוזר כשעוברים route / סוגרים tab)
+  // ✅ release lock on unmount
   useEffect(() => {
     return () => {
-      if (tweetId) releaseEscalationLock(tweetId);
+      // fire-and-forget
+      if (tweetIdRef.current) releaseEscalationLock();
     };
-  }, [tweetId, releaseEscalationLock]);
+  }, [releaseEscalationLock]);
 
   // Timer logic (10 minutes)
   useEffect(() => {
-    if (!receivedAt || errorMsg || !tweetId) return;
+    if (!receivedAt || errorMsg) return;
 
     const timerInterval = setInterval(async () => {
       const elapsedSeconds = (Date.now() - receivedAt) / 1000;
       if (elapsedSeconds > 600) {
         setReceivedAt(null);
 
-        // ✅ חשוב: לשחרר נעילה כשהזמן נגמר
-        await releaseEscalationLock(tweetId);
+        await releaseEscalationLock();
+
+        // clear local state so UI doesn't flicker
+        setTweet(null);
+        tweetIdRef.current = null;
+        lockedAtRef.current = null;
 
         setErrorMsg(TIMEOUT_MSG);
         clearInterval(timerInterval);
@@ -159,13 +182,17 @@ export default function EscalationTagPage() {
     }, 2000);
 
     return () => clearInterval(timerInterval);
-  }, [receivedAt, errorMsg, tweetId, releaseEscalationLock]);
+  }, [receivedAt, errorMsg, releaseEscalationLock]);
 
   const handleCloseModal = async () => {
     if (errorMsg === TIMEOUT_MSG) {
       const id = passedTweet?._id || passedTweet?.id;
-      if (id) claimEscalated(id);
-      else navigate("/escalation");
+      if (id) {
+        initialClaimDoneRef.current = false; // allow re-claim
+        claimEscalated(id);
+      } else {
+        navigate("/escalation");
+      }
     } else {
       setErrorMsg(null);
     }
@@ -177,6 +204,8 @@ export default function EscalationTagPage() {
     setCategory((prev) => (prev === cat ? null : cat));
 
   const submit = async () => {
+    const tweetId = tweetIdRef.current;
+
     if (!tweet || !tweetId) {
       setErrorMsg("No tweet loaded");
       return false;
@@ -201,7 +230,7 @@ export default function EscalationTagPage() {
         },
         body: JSON.stringify({
           tweet_id: tweetId,
-          locked_at: tweet.locked_at,
+          locked_at: tweet.locked_at, // comes from claim
           category,
           is_dangerous: isDangerous,
         }),
@@ -214,10 +243,11 @@ export default function EscalationTagPage() {
         return false;
       }
 
-      // אחרי submit, הציוץ כבר לא אצלך
+      // after submit, you no longer hold the lock
       setTweet(null);
-      setTweetId(null);
       setReceivedAt(null);
+      tweetIdRef.current = null;
+      lockedAtRef.current = null;
 
       return true;
     } catch (err) {
@@ -235,8 +265,11 @@ export default function EscalationTagPage() {
   };
 
   const handleBack = async () => {
-    // ✅ שחרור נעילה כשעושים Back בלי submit
-    if (tweetId) await releaseEscalationLock(tweetId);
+    await releaseEscalationLock();
+    setTweet(null);
+    setReceivedAt(null);
+    tweetIdRef.current = null;
+    lockedAtRef.current = null;
     navigate("/escalation");
   };
 
