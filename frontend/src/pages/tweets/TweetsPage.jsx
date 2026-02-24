@@ -40,10 +40,8 @@ export default function TweetsPage() {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           body: JSON.stringify({ tweet_id: id, locked_at: new Date().toISOString() }),
-          // locked_at פה לא באמת קריטי כי בשרת אנחנו משחררים לפי locked_by של המשתמש
         });
       } catch (e) {
-        // לא מפיל UI אם השחרור נכשל
         console.warn("releaseLock failed:", e);
       }
     },
@@ -65,7 +63,6 @@ export default function TweetsPage() {
       return;
     }
 
-    // ✅ לפני שתופסים ציוץ חדש – משחררים את הנעילה הקודמת (אם הייתה)
     if (tweetId) {
       await releaseLock(tweetId);
     }
@@ -152,7 +149,6 @@ export default function TweetsPage() {
     setCategory((prev) => (prev === cat ? null : cat));
 
   const submit = async () => {
-    // ✅ guards כדי לא לגעת ב-locked_at כשאין tweet
     if (!tweet || !tweetId) {
       setErrorMsg("No tweet loaded");
       return false;
@@ -179,7 +175,7 @@ export default function TweetsPage() {
         },
         body: JSON.stringify({
           tweet_id: tweetId,
-          locked_at: tweet.locked_at, // חייב לבוא מהשרת
+          locked_at: tweet.locked_at, 
           category,
           is_dangerous: isDangerous,
         }),
@@ -242,10 +238,14 @@ export default function TweetsPage() {
   };
 
   const handleBack = async () => {
-    // ✅ שחרור נעילה לפני יציאה מהעמוד
-    if (tweetId) await releaseLock(tweetId);
-    navigate("/home");
-  };
+  if (tweetId) {
+    await releaseLock(tweetId);
+  }
+
+  const isAdmin = localStorage.getItem("isADMIN") === "true";
+
+  navigate(isAdmin ? "/home" : "/home-user");
+};
 
   if (loading) return <div className={styles.center}>Loading...</div>;
 

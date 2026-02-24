@@ -4,6 +4,8 @@ import EscalatedTweetsPage from "./pages/EscalatedTweetsPage/EscalatedTweetsPage
 import Login from "./pages/login/login";
 import Register from "./pages/register/register";
 import Home from "./pages/home/Home";
+import HomeUser from "./pages/home/HomeUser";
+
 import TweetsPage from "./pages/tweets/TweetsPage";
 import TaggedTweetsPage from "./pages/TaggedTweetsPage/TaggedTweetsPage"; 
 import EscalationTagPage from "./pages/EscalationTagPage/EscalationTagPage";
@@ -23,22 +25,26 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/Register" element={<Register />} />
 
-          {/* עמוד הבית אחרי לוגין */}
+          {}
           <Route path="/home" element={<Home />} />
 
-          {/* משיכת ציוץ רנדומלי */}
+          {}
           <Route path="/tweets" element={<TweetsPage />} />
 
-          {/* ← העמוד של ה-DB (ציוצים מתוייגים) */}
+          {}
           <Route path="/tagged-tweets" element={<TaggedTweetsPage />} />
 
-          {/* fallback */}
+          {}
           <Route path="*" element={<Navigate to="/login" />} />
           <Route path="/escalation" element={<EscalatedTweetsPage />} />
           <Route path="/escalation-tag" element={<EscalationTagPage />} />
            <Route path="/table" element={<TaggingLeaderboardPage />} />
             <Route path="/tags" element={<MyTaggedTweetsPage/>} />
             <Route path="/edit-tweet" element={<EditTweetPage />} />
+             <Route path="/home" element={<Home />} />
+                          <Route path="/home-user" element={<HomeUser />} />
+
+
             
     
         </Routes>

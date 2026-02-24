@@ -1,9 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header/Header.jsx";
-import styles from "./Home.module.css";
+import styles from "./HomeUser.module.css";
 
-export default function Home() {
+export default function HomeUser() {
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
@@ -24,39 +24,17 @@ export default function Home() {
           <p className={styles.welcome}>hello {username}!</p>
 
           <button
-            className={`${styles.btn} ${styles.btnDark}`}
+            className={`${styles.btn} ${styles.btnPrimary}`}
             onClick={() => navigate("/tweets")}
           >
             pull random tweet
           </button>
 
           <button
-            className={`${styles.btn} ${styles.btnMid}`}
+            className={`${styles.btn} ${styles.btnSecondary}`}
             onClick={() => navigate("/tags")}
           >
             view my tags
-          </button>
-
-          {/* ✅ Admin-only buttons — always shown on this page */}
-          <button
-            className={`${styles.btn} ${styles.btnLight}`}
-            onClick={() => navigate("/tagged-tweets")}
-          >
-            view database
-          </button>
-
-          <button
-            className={`${styles.btn} ${styles.btnLight}`}
-            onClick={() => navigate("/escalation")}
-          >
-            tag escalated tweets
-          </button>
-
-          <button
-            className={`${styles.btn} ${styles.btnLight}`}
-            onClick={() => navigate("/table")}
-          >
-            Tagging Rankings
           </button>
         </div>
       </div>
