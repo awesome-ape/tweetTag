@@ -12,7 +12,11 @@ from backend.app.controller.tweets_controller.display_controller import (
 from dotenv import load_dotenv
 from pathlib import Path
 from fastapi.middleware.cors import CORSMiddleware
-from backend.app.db.database import working_collection, escalation_collection
+from backend.app.db.database import (
+    working_collection,
+    escalation_collection,
+    processed_collection,
+)
 from backend.app.services.tweets.tagger import release_stale_locks
 import asyncio
 from asyncio import create_task
@@ -27,7 +31,12 @@ async def lifespan(app: FastAPI):
         await connect_to_mongo()
         print("MongoDB connected successfully.")
         cleanup_task = asyncio.create_task(release_stale_locks(working_collection))
-        cleanup_task = asyncio.create_task(release_stale_locks(escalation_collection))
+        cleanup_task_esclated = asyncio.create_task(
+            release_stale_locks(escalation_collection)
+        )
+        cleanup_task_processed = asyncio.create_task(
+            release_stale_locks(processed_collection)
+        )
     except Exception as e:
         print(f"Error connecting to MongoDB: {e}")
         raise e

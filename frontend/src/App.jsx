@@ -9,6 +9,7 @@ import TaggedTweetsPage from "./pages/TaggedTweetsPage/TaggedTweetsPage";
 import EscalationTagPage from "./pages/EscalationTagPage/EscalationTagPage";
 import TaggingLeaderboardPage from "./pages/TaggingLeaderboardPage/TaggingLeaderboardPage"
 import MyTaggedTweetsPage from "./pages/MyTaggedTweetsPage/MyTaggedTweetsPage"
+import EditTweetPage from "./pages/EditTweetPage/EditTweetPage";
 
 import "./index.css";
 
@@ -37,6 +38,9 @@ function App() {
           <Route path="/escalation-tag" element={<EscalationTagPage />} />
            <Route path="/table" element={<TaggingLeaderboardPage />} />
             <Route path="/tags" element={<MyTaggedTweetsPage/>} />
+            <Route path="/edit-tweet" element={<EditTweetPage />} />
+            
+    
         </Routes>
       </div>
     </Router>
