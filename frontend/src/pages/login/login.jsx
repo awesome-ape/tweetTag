@@ -6,6 +6,17 @@ import ErrorModal from "../../components/ErrorModal/ErrorModal.jsx";
 import ThemeToggle from "../../components/ThemeToggle/ThemeToggle.jsx";
 import styles from "./login.module.css";
 
+function toBoolean(value) {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") return value !== 0;
+  if (typeof value === "string") {
+    const v = value.trim().toLowerCase();
+    if (["true", "1", "yes", "y"].includes(v)) return true;
+    if (["false", "0", "no", "n", ""].includes(v)) return false;
+  }
+  return false;
+}
+
 export default function Login() {
   const navigate = useNavigate();
 
@@ -30,15 +41,8 @@ export default function Login() {
     const username = (formData.username || "").trim();
     const password = formData.password || "";
 
-    // ✅ validate BEFORE fetch
-    if (!username) {
-      triggerError("Please fill in your username");
-      return;
-    }
-    if (!password) {
-      triggerError("Please fill in your password");
-      return;
-    }
+    if (!username) return triggerError("Please fill in your username");
+    if (!password) return triggerError("Please fill in your password");
 
     const serverUrl =
       import.meta.env.VITE_SERVER_URL || "http://127.0.0.1:8000";
@@ -61,15 +65,19 @@ export default function Login() {
           localStorage.setItem("token", data.access_token);
         }
 
-        // ✅ Save username (immediate UI on Home)
-        localStorage.setItem("username", data?.username || username);
+        // ✅ user object comes inside "user"
+        const user = data?.user;
 
-        // ✅ Save admin flag (immediate UI on Home)
-        // supports possible names: isADMIN / is_admin / admin
-        const adminFlag = data?.isADMIN ?? data?.is_admin ?? data?.admin ?? false;
-        localStorage.setItem("isADMIN", String(Boolean(adminFlag)));
+        // ✅ Save username for UI
+        localStorage.setItem("username", user?.username || username);
 
-        navigate("/home");
+        // ✅ Admin flag is inside user as "isADMIN"
+        const isAdmin = toBoolean(user?.isADMIN);
+
+        localStorage.setItem("isADMIN", String(isAdmin));
+
+        // ✅ Conditional navigation
+        navigate(isAdmin ? "/home" : "/home-user");
       } else {
         const errorMsg = Array.isArray(data?.detail)
           ? data.detail?.[0]?.msg || "Login failed."
@@ -85,7 +93,7 @@ export default function Login() {
 
   return (
     <div className="app-wrapper">
-      {/* Floating Theme Toggle in the top-right corner */}
+      {/* Floating Theme Toggle */}
       <div style={{ position: "fixed", top: "20px", right: "20px", zIndex: 2000 }}>
         <ThemeToggle />
       </div>

@@ -71,7 +71,10 @@ export default function MyTaggedTweetsPage() {
             <button
               className={styles.backBtn}
               type="button"
-              onClick={() => navigate("/home")}
+              onClick={() => {
+                const isAdmin = localStorage.getItem("isADMIN") === "true";
+                navigate(isAdmin ? "/home" : "/home-user");
+              }}
             >
               Back
             </button>
