@@ -87,7 +87,7 @@
   padding: 14px 12px;
   text-align: center;
   border-bottom: 1px solid var(--border-soft);
-  color: #ffffff; /* requested: table text is white */
+  color: #ffffff; 
 }
 
 /* Header row */
@@ -102,6 +102,10 @@
 .table tr:nth-child(even) td {
   background: var(--overlay);
 }
+.table tr:nth-child(odd) td {
+  background: var(--cat-oil);
+}
+
 
 /* Hover */
 .table tbody tr:hover td {

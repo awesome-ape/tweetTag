@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Input from '../../components/Input/Input.jsx';
 import Button from '../../components/Button/Button.jsx';
 import ErrorModal from '../../components/ErrorModal/ErrorModal.jsx';
+import ThemeToggle from "../../components/ThemeToggle/ThemeToggle.jsx";
 import styles from './login.module.css'; 
 
 export default function Login() {
@@ -26,30 +27,27 @@ export default function Login() {
     const url = `${serverUrl}/auth/login`;
 
     try {
+      if(!formData.username){
+        triggerError("please fill in you'r username")
+        return
+      }
+      if(!formData.password){
+        triggerError("please fill in you'r passowrd")
+        return
+      }
+
       const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams(formData)
       });
-      if(!formData.password){
-        const error = "please fill in you'r passowrd"
-        triggerError(error)
-        return
-      }
-      if(!formData.username){
-        const error = "please fill in you'r username"
-        triggerError(error)
-        return
-      }
       
       const data = await response.json();
 
       if (response.ok) {
-        // Save token to localStorage for persistent login
         if (data?.access_token) {
           localStorage.setItem("token", data.access_token);
         }
-        // Redirect to home page
         navigate("/home");
       } else {
         const errorMsg = Array.isArray(data.detail) 
@@ -64,6 +62,11 @@ export default function Login() {
 
   return (
     <div className="app-wrapper">
+      {/* Floating Theme Toggle in the top-right corner */}
+      <div style={{ position: 'fixed', top: '20px', right: '20px', zIndex: 2000 }}>
+        <ThemeToggle />
+      </div>
+
       <div className={styles['login-card']}>
         <header className={styles['login-header']}>Welcome to TweetTag</header>
         

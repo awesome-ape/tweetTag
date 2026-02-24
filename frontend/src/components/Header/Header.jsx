@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import ThemeToggle from "../ThemeToggle/ThemeToggle.jsx"
 import styles from "./Header.module.css"; 
 
 export default function Header() {
   const navigate = useNavigate();
-  // 1. Setup state for the data we're fetching
   const [headerData, setHeaderData] = useState({ username: "Loading...", processed_count: 0 });
 
   useEffect(() => {
@@ -19,12 +19,11 @@ export default function Header() {
         const serverUrl = import.meta.env.VITE_SERVER_URL || "http://127.0.0.1:8000";
         const endpoint = "/get_header_data";
         
-        // Added backticks ` ` for the template literal
         const res = await fetch(`${serverUrl}${endpoint}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
 
-        const data = await res.json(); // Added () to .json()
+        const data = await res.json();
         
         if (res.ok) {
           setHeaderData(data);
@@ -37,7 +36,7 @@ export default function Header() {
     };
 
     fetchHeaderData();
-  }, [navigate]); // Runs once on mount
+  }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -56,7 +55,7 @@ export default function Header() {
       </div>
 
       <div className={styles.navRight}>
-        {/* 2. Display the count and username from state */}
+        <ThemeToggle /> {/* Inserted Button Here */}
         <span className={styles.countBadge}>✅tagged: {headerData.processed_count}</span>
         <span className={styles.username}>👤 {headerData.username}</span>
         <button className={styles.logoutBtn} onClick={handleLogout}>

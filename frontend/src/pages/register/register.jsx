@@ -3,6 +3,7 @@ import { Link,useNavigate } from 'react-router-dom';
 import Input from '../../components/Input/Input.jsx';
 import Button from '../../components/Button/Button.jsx';
 import ErrorModal from '../../components/ErrorModal/ErrorModal.jsx';
+import ThemeToggle from "../../components/ThemeToggle/ThemeToggle.jsx";
 import styles from './register.module.css';
 
 export default function RegisterPage() {
@@ -63,8 +64,13 @@ export default function RegisterPage() {
     }
   };
 
-  return (
+ return (
     <div className="app-wrapper">
+      {/* Fixed: changed z-index to zIndex */}
+      <div style={{ position: 'fixed', top: '20px', right: '20px', zIndex: 2000 }}>
+        <ThemeToggle />
+      </div>
+
       <div className={styles['register-card']}>
         <header className={styles['login-header']}>Register</header>
         <form onSubmit={(e) => { e.preventDefault(); handleAction(); }}>
@@ -83,6 +89,7 @@ export default function RegisterPage() {
             placeholder="Email@email.com"
             onChange={handleChange}
           />
+
           <Input 
             className={styles['password-input']} 
             name="password" 
