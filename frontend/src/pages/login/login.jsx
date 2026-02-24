@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import Input from '../../components/Input/Input.jsx';
-import Button from '../../components/Button/Button.jsx';
-import ErrorModal from '../../components/ErrorModal/ErrorModal.jsx';
-import styles from './login.module.css'; 
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import Input from "../../components/Input/Input.jsx";
+import Button from "../../components/Button/Button.jsx";
+import ErrorModal from "../../components/ErrorModal/ErrorModal.jsx";
+import styles from "./login.module.css";
 
 export default function Login() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ username: '', password: '' });
+
+  const [formData, setFormData] = useState({ username: "", password: "" });
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const triggerError = (msg) => {
     setErrorMessage(msg);
@@ -22,91 +24,113 @@ export default function Login() {
   };
 
   const handleAction = async () => {
-    const serverUrl = import.meta.env.VITE_SERVER_URL;
+    const username = (formData.username || "").trim();
+    const password = formData.password || "";
+
+    // ✅ validate BEFORE fetch
+    if (!username) {
+      triggerError("Please fill in your username");
+      return;
+    }
+    if (!password) {
+      triggerError("Please fill in your password");
+      return;
+    }
+
+    const serverUrl =
+      import.meta.env.VITE_SERVER_URL || "http://127.0.0.1:8000";
     const url = `${serverUrl}/auth/login`;
+
+    setLoading(true);
 
     try {
       const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams(formData)
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ username, password }),
       });
-      if(!formData.password){
-        const error = "please fill in you'r passowrd"
-        triggerError(error)
-        return
-      }
-      if(!formData.username){
-        const error = "please fill in you'r username"
-        triggerError(error)
-        return
-      }
-      
-      const data = await response.json();
+
+      const data = await response.json().catch(() => ({}));
 
       if (response.ok) {
-        // Save token to localStorage for persistent login
+        // ✅ Save token
         if (data?.access_token) {
           localStorage.setItem("token", data.access_token);
         }
-        // Redirect to home page
+
+        // ✅ Save username (immediate UI on Home)
+        localStorage.setItem("username", data?.username || username);
+
+        // ✅ Save admin flag (immediate UI on Home)
+        // supports possible names: isADMIN / is_admin / admin
+        const adminFlag =
+          data?.isADMIN ?? data?.is_admin ?? data?.admin ?? false;
+        localStorage.setItem("isADMIN", String(Boolean(adminFlag)));
+
         navigate("/home");
       } else {
-        const errorMsg = Array.isArray(data.detail) 
-        ? data.detail[0].msg 
-        : data.detail || "Login failed.";
+        const errorMsg = Array.isArray(data?.detail)
+          ? data.detail?.[0]?.msg || "Login failed."
+          : data?.detail || "Login failed.";
         triggerError(errorMsg);
       }
     } catch (err) {
       triggerError(`Could not connect to the server (${url}).`);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="app-wrapper">
-      <div className={styles['login-card']}>
-        <header className={styles['login-header']}>Welcome to TweetTag</header>
-        
-        <form onSubmit={(e) => { e.preventDefault(); handleAction(); }}>
-          <Input 
-            className={styles['username-input']} 
-            name="username" 
+      <div className={styles["login-card"]}>
+        <header className={styles["login-header"]}>Welcome to TweetTag</header>
+
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!loading) handleAction();
+          }}
+        >
+          <Input
+            className={styles["username-input"]}
+            name="username"
             value={formData.username}
             placeholder="Username"
             onChange={handleChange}
+            autoComplete="username"
           />
-          
-          <Input 
-            className={styles['password-input']} 
-            name="password" 
-            type="password" 
-            value={formData.password} 
-            placeholder="Password" 
-            onChange={handleChange} 
+
+          <Input
+            className={styles["password-input"]}
+            name="password"
+            type="password"
+            value={formData.password}
+            placeholder="Password"
+            onChange={handleChange}
+            autoComplete="current-password"
           />
-          
-          <div className={styles['reg-container']}>
+
+          <div className={styles["reg-container"]}>
             <span>Don't have an account?</span>
-            <Link to="/register" className={styles['signup-link']}>
+            <Link to="/register" className={styles["signup-link"]}>
               Sign Up
             </Link>
           </div>
 
-          <Button 
-            className={styles['btn-sub']} 
-            type="submit" 
+          <Button
+            className={styles["btn-sub"]}
+            type="submit"
             variant="primary"
+            disabled={loading}
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </Button>
         </form>
       </div>
 
       {showError && (
-        <ErrorModal 
-          message={errorMessage} 
-          onClose={() => setShowError(false)} 
-        />
+        <ErrorModal message={errorMessage} onClose={() => setShowError(false)} />
       )}
     </div>
   );

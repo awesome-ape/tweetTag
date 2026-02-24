@@ -102,7 +102,9 @@
 .table tr:nth-child(even) td {
   background: var(--overlay);
 }
-
+.table tr:nth-child(odd) td {
+  background: var(--cat-oil);
+}
 /* Hover */
 .table tbody tr:hover td {
   background: var(--selected-cat-bg);

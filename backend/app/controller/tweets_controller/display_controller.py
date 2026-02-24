@@ -1,5 +1,3 @@
-# backend/app/controller/tweets_controller/display_controller.py
-
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from typing import Any, Dict, List, Optional, Tuple
@@ -17,9 +15,18 @@ class LeaderboardRow(BaseModel):
     total_processed: int
 
 
+# ✅ NEW: pagination response model
+class PaginatedTweetsResponse(BaseModel):
+    items: List[Tuple[TweetinDB, Optional[str]]]
+    page: int
+    pageSize: int
+    total: int
+    totalPages: int
+
+
 @router.get(
     "/get_tweets_for_display",
-    response_model=List[Tuple[TweetinDB, Optional[str]]],
+    response_model=PaginatedTweetsResponse,
 )
 async def get_tweets_for_display(
     current_user: Dict[str, Any] = Depends(get_current_user),
@@ -32,7 +39,11 @@ async def get_tweets_for_display(
     if not await is_admin(user_id):
         raise HTTPException(status_code=403, detail="Forbidden: Admins only")
 
-    return await display.get_processed_tweets(page=page)
+    if page < 1:
+        raise HTTPException(status_code=400, detail="page must be >= 1")
+
+    # ✅ returns {items,page,pageSize,total,totalPages}
+    return await display.get_processed_tweets_paginated(page=page)
 
 
 @router.get(
@@ -49,8 +60,6 @@ async def get_tagging_leaderboard(
     if not await is_admin(user_id):
         raise HTTPException(status_code=403, detail="Forbidden: Admins only")
 
-    # display.get_leaderboard() צריך להחזיר:
-    # [{ "username": "...", "total_processed": 12 }, ...]
     return await display.get_leaderboard()
 
 
