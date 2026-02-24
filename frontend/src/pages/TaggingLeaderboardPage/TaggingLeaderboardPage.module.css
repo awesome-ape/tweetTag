@@ -32,7 +32,7 @@
   flex-wrap: wrap;
 }
 
-/* Buttons (use your global .btn if you have it; otherwise keep these) */
+/* Buttons */
 .backBtn,
 .refreshBtn {
   padding: 10px 14px;
@@ -52,7 +52,6 @@
 }
 
 .refreshBtn {
-  /* slightly “more primary” while still based on your theme */
   background: var(--tweeter-blue);
   color: var(--btn-text);
   border-color: var(--border-soft);
@@ -65,7 +64,7 @@
   box-shadow: none;
 }
 
-/* Table wrapper to support rounded corners + shadow */
+/* Table wrapper */
 .tableWrap {
   border: 1px solid var(--border-soft);
   border-radius: 16px;
@@ -87,24 +86,26 @@
   padding: 14px 12px;
   text-align: center;
   border-bottom: 1px solid var(--border-soft);
-  color: #ffffff; /* requested: table text is white */
+  color: #ffffff;
 }
 
 /* Header row */
 .table th {
   background: var(--header-bg);
-  color: #ffffff; /* keep header text white too */
+  color: #ffffff;
   font-weight: 800;
   letter-spacing: 0.02em;
 }
 
-/* Zebra rows using overlay (no hardcoded colors) */
+/* Zebra rows */
 .table tr:nth-child(even) td {
   background: var(--overlay);
 }
+
 .table tr:nth-child(odd) td {
   background: var(--cat-oil);
 }
+
 /* Hover */
 .table tbody tr:hover td {
   background: var(--selected-cat-bg);

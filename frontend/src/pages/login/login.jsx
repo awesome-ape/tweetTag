@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Input from "../../components/Input/Input.jsx";
 import Button from "../../components/Button/Button.jsx";
 import ErrorModal from "../../components/ErrorModal/ErrorModal.jsx";
+import ThemeToggle from "../../components/ThemeToggle/ThemeToggle.jsx";
 import styles from "./login.module.css";
 
 export default function Login() {
@@ -24,6 +25,8 @@ export default function Login() {
   };
 
   const handleAction = async () => {
+    if (loading) return;
+
     const username = (formData.username || "").trim();
     const password = formData.password || "";
 
@@ -63,8 +66,7 @@ export default function Login() {
 
         // ✅ Save admin flag (immediate UI on Home)
         // supports possible names: isADMIN / is_admin / admin
-        const adminFlag =
-          data?.isADMIN ?? data?.is_admin ?? data?.admin ?? false;
+        const adminFlag = data?.isADMIN ?? data?.is_admin ?? data?.admin ?? false;
         localStorage.setItem("isADMIN", String(Boolean(adminFlag)));
 
         navigate("/home");
@@ -83,13 +85,18 @@ export default function Login() {
 
   return (
     <div className="app-wrapper">
+      {/* Floating Theme Toggle in the top-right corner */}
+      <div style={{ position: "fixed", top: "20px", right: "20px", zIndex: 2000 }}>
+        <ThemeToggle />
+      </div>
+
       <div className={styles["login-card"]}>
         <header className={styles["login-header"]}>Welcome to TweetTag</header>
 
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            if (!loading) handleAction();
+            handleAction();
           }}
         >
           <Input
