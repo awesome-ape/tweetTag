@@ -1,120 +1,158 @@
-import asyncio
-from bson import ObjectId
-from unittest import result
-from backend.app.db.database import (
-    backup_collection,
-    escalation_collection,
-    working_collection,
-    processed_collection,
-    users_collection,
-)
-from backend.app.schemas.tweet_scheme import TweetinDB
-from typing import List
-from dotenv import load_dotenv
 import os
-from typing import List, Dict
 from pathlib import Path
-from typing import List, Tuple
+from typing import Dict, List, Optional, Tuple
 
+from bson import ObjectId
+from dotenv import load_dotenv
+
+from backend.app.db.database import processed_collection, users_collection
+from backend.app.schemas.tweet_scheme import TweetinDB
 
 base_dir = Path(__file__).resolve().parent.parent.parent.parent
 load_dotenv(dotenv_path=base_dir / ".env")
 
 
-async def get_processed_tweets(page: int = 1):
-    # Ensure page_size is pulled correctly
-    page_size = int(os.getenv("PAGE_SIZE", 10))
+async def get_processed_tweets(page: int = 1) -> List[Tuple[TweetinDB, Optional[str]]]:
+    """
+    Returns: [(TweetinDB, tagged_by_username or None), ...]
+    """
+    page_size = int(os.getenv("PAGE_SIZE", "10"))
 
     pipeline = [
-        # 1. Sort and Paginate FIRST (Performance)
         {"$sort": {"locked_at": -1}},
         {"$skip": (page - 1) * page_size},
         {"$limit": page_size},
-        # 2. CONVERT String ID to ObjectId (Crucial Fix)
-        {"$addFields": {"tagged_by_obj": {"$toObjectId": "$tagged_by"}}},
-        # 3. The "Join" using the converted ID
+
+        # Normalize tagged_by -> ObjectId (supports: ObjectId / string / null)
+        {
+            "$addFields": {
+                "tagged_by_obj": {
+                    "$switch": {
+                        "branches": [
+                            # already ObjectId
+                            {"case": {"$eq": [{"$type": "$tagged_by"}, "objectId"]}, "then": "$tagged_by"},
+                            # string ObjectId
+                            {
+                                "case": {
+                                    "$and": [
+                                        {"$eq": [{"$type": "$tagged_by"}, "string"]},
+                                        {"$ne": ["$tagged_by", ""]},
+                                        {"$ne": ["$tagged_by", None]},
+                                    ]
+                                },
+                                "then": {"$toObjectId": "$tagged_by"},
+                            },
+                        ],
+                        "default": None,
+                    }
+                }
+            }
+        },
+
         {
             "$lookup": {
                 "from": "users",
-                "localField": "tagged_by_obj",  # Use the converted field
+                "localField": "tagged_by_obj",
                 "foreignField": "_id",
                 "as": "user_info",
             }
         },
-        # 4. Flatten the result (with safety)
-        {
-            "$unwind": {
-                "path": "$user_info",
-                "preserveNullAndEmptyArrays": True,  # Don't delete tweet if user not found
-            }
-        },
+        {"$unwind": {"path": "$user_info", "preserveNullAndEmptyArrays": True}},
     ]
 
     cursor = processed_collection.aggregate(pipeline)
-    results = []
 
+    results: List[Tuple[TweetinDB, Optional[str]]] = []
     async for doc in cursor:
-        # doc now contains BOTH tweet and user_info
         tweet = TweetinDB.from_mongo(doc)
-        username = doc["user_info"]["username"]
+
+        username: Optional[str] = None
+        ui = doc.get("user_info")
+        if isinstance(ui, dict):
+            username = ui.get("username")
+
         results.append((tweet, username))
 
     return results
 
 
 async def get_leaderboard() -> List[Dict]:
+    """
+    Returns:
+    [{ "username": <str>, "total_processed": <int> }, ...]
+    """
+
     pipeline = [
-        {"$group": {"_id": "$tagged_by", "total_processed": {"$sum": 1}}},
+        # Normalize tagged_by -> ObjectId for grouping (supports ObjectId/string/null)
+        {
+            "$addFields": {
+                "tagged_by_obj": {
+                    "$switch": {
+                        "branches": [
+                            {"case": {"$eq": [{"$type": "$tagged_by"}, "objectId"]}, "then": "$tagged_by"},
+                            {
+                                "case": {
+                                    "$and": [
+                                        {"$eq": [{"$type": "$tagged_by"}, "string"]},
+                                        {"$ne": ["$tagged_by", ""]},
+                                        {"$ne": ["$tagged_by", None]},
+                                    ]
+                                },
+                                "then": {"$toObjectId": "$tagged_by"},
+                            },
+                        ],
+                        "default": None,
+                    }
+                }
+            }
+        },
+
+        # Group by normalized object id
+        {"$group": {"_id": "$tagged_by_obj", "total_processed": {"$sum": 1}}},
         {"$sort": {"total_processed": -1}},
-        {"$addFields": {"user_id_obj": {"$toObjectId": "$_id"}}},
+
+        # Lookup username
         {
             "$lookup": {
                 "from": "users",
-                "localField": "user_id_obj",
+                "localField": "_id",
                 "foreignField": "_id",
                 "as": "user_info",
             }
         },
-        {"$unwind": "$user_info"},
+        {"$unwind": {"path": "$user_info", "preserveNullAndEmptyArrays": True}},
+
+        # Project output (username not id)
         {
             "$project": {
-                "username": "$user_info.username",
-                "total_processed": 1,
                 "_id": 0,
+                "username": {"$ifNull": ["$user_info.username", "Unknown"]},
+                "total_processed": 1,
             }
         },
     ]
 
-    # .to_list(length=None) fetches all results from the cursor into a Python list
     cursor = processed_collection.aggregate(pipeline)
     results = await cursor.to_list(length=None)
-
     return results
 
 
 async def get_header_data(user_id: str) -> Dict:
+    """
+    Returns: {"username": str, "processed_count": int}
+    """
+    uid_string = str(user_id).strip()
+
+    processed_count = await processed_collection.count_documents({"tagged_by": uid_string})
+
+    # Safe ObjectId conversion
     try:
-        # 1. Count processed tweets (using string ID as stored in tagged_by)
-        uid_string = str(user_id).strip()
-        print(f"DEBUG: Variable value is '{uid_string}'")
-        processed_count = await processed_collection.count_documents(
-            {"tagged_by": uid_string}
-        )
+        oid = ObjectId(uid_string)
+    except Exception:
+        return {"username": "Unknown", "processed_count": processed_count}
 
-        # 2. Look up the username (converting string to ObjectId for the users table)
-        # We only include the 'username' field and exclude '_id'
-        user_doc = await users_collection.find_one(
-            {"_id": ObjectId(user_id)}, {"username": 1, "_id": 0}
-        )
+    user_doc = await users_collection.find_one({"_id": oid}, {"username": 1, "_id": 0})
+    if not user_doc:
+        return {"username": "Unknown", "processed_count": processed_count}
 
-        if not user_doc:
-            return {"username": "Unknown", "processed_count": processed_count}
-
-        return {
-            "username": user_doc.get("username"),
-            "processed_count": processed_count,
-        }
-
-    except Exception as e:
-        print(f"Error in get_header_data: {e}")
-        return {"username": "Error", "processed_count": 0}
+    return {"username": user_doc.get("username", "Unknown"), "processed_count": processed_count}

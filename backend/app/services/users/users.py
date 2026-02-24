@@ -3,21 +3,40 @@ from backend.app.db.database import users_collection
 
 
 async def is_admin(user_id: str) -> bool:
-    # i add the imports inside the function so i acn import this function anywhere without causing circular imports
-    from bson import ObjectId
-    from backend.app.db.database import users_collection
+    """
+    Returns True only if user exists AND isADMIN == True
+    """
 
-    user = await users_collection.find_one({"_id": ObjectId(user_id)})
+    try:
+        oid = ObjectId(str(user_id))
+    except Exception:
+        return False
+
+    user = await users_collection.find_one({"_id": oid})
+
     if not user:
         return False
-    return user["isADMIN"] is not None
+
+    # ⚠️ התיקון הקריטי כאן
+    return bool(user.get("isADMIN", False))
 
 
-async def get_user_by_id(user_id: str):
-    from bson import ObjectId
-    from backend.app.db.database import users_collection
+async def get_user_by_id(user_id: str) -> str | None:
+    """
+    Returns username string or None.
+    """
 
-    user_data = await users_collection.find_one({"_id": ObjectId(user_id)})
-    if not user_data:
+    try:
+        oid = ObjectId(str(user_id))
+    except Exception:
         return None
-    return user_data["username"]
+
+    user = await users_collection.find_one(
+        {"_id": oid},
+        {"username": 1}
+    )
+
+    if not user:
+        return None
+
+    return user.get("username")

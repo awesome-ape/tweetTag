@@ -11,44 +11,54 @@ class TweetSchema(BaseModel):
 
     model_config = ConfigDict(
         populate_by_name=True,
-        arbitrary_types_allowed=True
+        arbitrary_types_allowed=True,
     )
 
 
 class TweetinDB(TweetSchema):
-    uploaded_by: str
-    status: str ="pending"
+    status: str = "pending"
     locked_at: Optional[datetime] = None
+    locked_by: Optional[str] = None  # ✅ NEW
     tagged_by: Optional[str] = None
     is_dangerous: Optional[bool] = None
     category: Optional[str] = None
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True,extra="ignore")
+
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        populate_by_name=True,
+        extra="ignore",
+    )
 
     @classmethod
     def from_mongo(cls, data: dict):
-         if not data:
-             return None
-         if "_id" in data:
-             data["_id"] = str(data["_id"])
-         return cls(**data)
-      # e.g., "pending", "tagged", etc.
+        if not data:
+            return None
+        if "_id" in data:
+            data["_id"] = str(data["_id"])
+        return cls(**data)
+
+
 class taggSchema(BaseModel):
     tweet_id: str
     is_dangerous: bool
     category: str
     tagged_by: str
     locked_at: datetime
+
     model_config = ConfigDict(arbitrary_types_allowed=True)
+
 
 class taggSchemaFront(BaseModel):
     is_dangerous: bool
     category: str
     tweet_id: str
     locked_at: datetime
+
     model_config = ConfigDict(arbitrary_types_allowed=True)
+
 
 class esclateSchema(BaseModel):
     tweet_id: str
     locked_at: datetime
-    model_config = ConfigDict(arbitrary_types_allowed=True)
 
+    model_config = ConfigDict(arbitrary_types_allowed=True)
