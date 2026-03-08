@@ -16,7 +16,14 @@ from backend.app.db.database import (
 from backend.app.schemas.tweet_scheme import TweetinDB, taggSchema, esclateSchema
 
 base_dir = Path(__file__).resolve().parent.parent.parent.parent
-load_dotenv(dotenv_path=base_dir / ".env")
+env_path = base_dir / ".env"
+
+if env_path.exists():
+    # If the file is there (Your Laptop), load it
+    load_dotenv(dotenv_path=env_path)
+else:
+    # If the file is missing (AWS), load from the System Environment
+    load_dotenv()
 
 
 def _now_utc() -> datetime:

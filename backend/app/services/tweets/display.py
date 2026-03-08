@@ -8,8 +8,15 @@ from dotenv import load_dotenv
 from backend.app.db.database import processed_collection, users_collection
 from backend.app.schemas.tweet_scheme import TweetinDB
 
+# 1. Try to find the .env file at your specific path (Local Dev)
 base_dir = Path(__file__).resolve().parent.parent.parent.parent
-load_dotenv(dotenv_path=base_dir / ".env")
+env_path = base_dir / ".env"
+
+if env_path.exists():
+    load_dotenv(dotenv_path=env_path)
+else:
+    # 2. If the file is missing (AWS), just load from the system environment
+    load_dotenv()
 
 
 async def get_processed_tweets(page: int = 1) -> List[Tuple[TweetinDB, Optional[str]]]:
@@ -22,7 +29,6 @@ async def get_processed_tweets(page: int = 1) -> List[Tuple[TweetinDB, Optional[
         {"$sort": {"locked_at": -1}},
         {"$skip": (page - 1) * page_size},
         {"$limit": page_size},
-
         # Normalize tagged_by -> ObjectId (supports: ObjectId / string / null)
         {
             "$addFields": {
@@ -30,7 +36,10 @@ async def get_processed_tweets(page: int = 1) -> List[Tuple[TweetinDB, Optional[
                     "$switch": {
                         "branches": [
                             # already ObjectId
-                            {"case": {"$eq": [{"$type": "$tagged_by"}, "objectId"]}, "then": "$tagged_by"},
+                            {
+                                "case": {"$eq": [{"$type": "$tagged_by"}, "objectId"]},
+                                "then": "$tagged_by",
+                            },
                             # string ObjectId
                             {
                                 "case": {
@@ -48,7 +57,6 @@ async def get_processed_tweets(page: int = 1) -> List[Tuple[TweetinDB, Optional[
                 }
             }
         },
-
         {
             "$lookup": {
                 "from": "users",
@@ -89,7 +97,10 @@ async def get_leaderboard() -> List[Dict]:
                 "tagged_by_obj": {
                     "$switch": {
                         "branches": [
-                            {"case": {"$eq": [{"$type": "$tagged_by"}, "objectId"]}, "then": "$tagged_by"},
+                            {
+                                "case": {"$eq": [{"$type": "$tagged_by"}, "objectId"]},
+                                "then": "$tagged_by",
+                            },
                             {
                                 "case": {
                                     "$and": [
@@ -106,11 +117,9 @@ async def get_leaderboard() -> List[Dict]:
                 }
             }
         },
-
         # Group by normalized object id
         {"$group": {"_id": "$tagged_by_obj", "total_processed": {"$sum": 1}}},
         {"$sort": {"total_processed": -1}},
-
         # Lookup username
         {
             "$lookup": {
@@ -121,7 +130,6 @@ async def get_leaderboard() -> List[Dict]:
             }
         },
         {"$unwind": {"path": "$user_info", "preserveNullAndEmptyArrays": True}},
-
         # Project output (username not id)
         {
             "$project": {
@@ -143,7 +151,9 @@ async def get_header_data(user_id: str) -> Dict:
     """
     uid_string = str(user_id).strip()
 
-    processed_count = await processed_collection.count_documents({"tagged_by": uid_string})
+    processed_count = await processed_collection.count_documents(
+        {"tagged_by": uid_string}
+    )
 
     # Safe ObjectId conversion
     try:
@@ -155,4 +165,7 @@ async def get_header_data(user_id: str) -> Dict:
     if not user_doc:
         return {"username": "Unknown", "processed_count": processed_count}
 
-    return {"username": user_doc.get("username", "Unknown"), "processed_count": processed_count}
+    return {
+        "username": user_doc.get("username", "Unknown"),
+        "processed_count": processed_count,
+    }

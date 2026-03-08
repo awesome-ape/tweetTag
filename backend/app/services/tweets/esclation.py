@@ -11,8 +11,15 @@ from backend.app.db.database import escalation_collection
 from backend.app.schemas.tweet_scheme import TweetinDB, taggSchema
 from backend.app.services.tweets.tagger import submit_tagged_tweet, release_lock
 
-base_dir = Path(__file__).resolve().parent.parent.parent.parent
-load_dotenv(dotenv_path=base_dir / ".env")
+# Try to find the .env file locally (4 levels up)
+env_path = Path(__file__).resolve().parent.parent.parent.parent / ".env"
+
+if env_path.exists():
+    # If the file exists (Local), load it
+    load_dotenv(dotenv_path=env_path)
+else:
+    # If the file is missing (AWS), load from system environment
+    load_dotenv()
 
 
 def _now_utc() -> datetime:
@@ -25,7 +32,11 @@ def _timeout_seconds() -> int:
 
 async def get_escalated_tweets(limit: int = 200) -> List[TweetinDB]:
     # Better sorting: queued_at if exists, else _id
-    cursor = escalation_collection.find({}).sort([("queued_at", -1), ("_id", -1)]).limit(limit)
+    cursor = (
+        escalation_collection.find({})
+        .sort([("queued_at", -1), ("_id", -1)])
+        .limit(limit)
+    )
 
     tweets: List[TweetinDB] = []
     async for doc in cursor:
@@ -49,10 +60,8 @@ async def claim_escalated_tweet(tweet_id: str, user_id: str) -> Optional[Tweetin
             {"status": {"$exists": False}},
             {"status": None},
             {"status": "pending"},
-
             # reclaim by same admin
             {"status": "tagging", "locked_by": str(user_id)},
-
             # stale/invalid locks
             {"status": "tagging", "locked_at": {"$lt": expiry_time}},
             {"status": "tagging", "locked_at": {"$exists": False}},
