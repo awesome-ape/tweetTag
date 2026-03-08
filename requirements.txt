@@ -1,7 +1,7 @@
-motor
+fastapi
+uvicorn
 motor[srv]
 python-dotenv
-fastapi[all]
 bcrypt==4.0.1
 passlib[bcrypt]
 python-jose[cryptography]
