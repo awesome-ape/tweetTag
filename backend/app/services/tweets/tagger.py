@@ -15,8 +15,14 @@ from backend.app.db.database import (
 )
 from backend.app.schemas.tweet_scheme import TweetinDB, taggSchema, esclateSchema
 
-base_dir = Path(__file__).resolve().parent.parent.parent.parent
-load_dotenv(dotenv_path=base_dir / ".env")
+env_path = Path(__file__).resolve().parent.parent.parent.parent / ".env"
+
+if env_path.exists():
+    # Local: Load the file from your 4-level deep path
+    load_dotenv(dotenv_path=env_path)
+else:
+    # AWS: The file is missing, so use the variables in the Console
+    load_dotenv()
 
 
 def _now_utc() -> datetime:
@@ -45,7 +51,6 @@ async def claim_tweet(collection, user_id: str) -> Optional[TweetinDB]:
             {"status": {"$exists": False}},
             {"status": None},
             {"status": "pending"},
-
             # stale/invalid locks
             {"status": "tagging", "locked_at": {"$lt": expiry_time}},
             {"status": "tagging", "locked_at": {"$exists": False}},
@@ -104,11 +109,15 @@ async def submit_tagged_tweet(payload: taggSchema, collection) -> bool:
     )
 
     if not tweet:
-        raise ValueError("Submission failed: lock invalid / expired / not owned by user.")
+        raise ValueError(
+            "Submission failed: lock invalid / expired / not owned by user."
+        )
 
     # Move to processed if coming from working (upsert prevents DuplicateKey)
     if collection != processed_collection:
-        await processed_collection.replace_one({"_id": tweet["_id"]}, tweet, upsert=True)
+        await processed_collection.replace_one(
+            {"_id": tweet["_id"]}, tweet, upsert=True
+        )
         await collection.delete_one({"_id": tweet["_id"]})
 
     return True
@@ -186,7 +195,9 @@ async def escalate_tweet(payload: esclateSchema, user_id: str) -> bool:
 
     tweet = await working_collection.find_one(query)
     if not tweet:
-        raise ValueError("Escalation failed: lock invalid / expired / not owned by user.")
+        raise ValueError(
+            "Escalation failed: lock invalid / expired / not owned by user."
+        )
 
     tweet["status"] = "pending"
     tweet.pop("locked_at", None)
@@ -259,10 +270,8 @@ async def claim_processed_tweet(tweet_id: str, user_id: str) -> Optional[Tweetin
             {"status": None},
             {"status": "pending"},
             {"status": "tagged"},
-
             # reclaim by same admin
             {"status": "tagging", "locked_by": str(user_id)},
-
             # stale/invalid locks
             {"status": "tagging", "locked_at": {"$lt": expiry_time}},
             {"status": "tagging", "locked_at": {"$exists": False}},

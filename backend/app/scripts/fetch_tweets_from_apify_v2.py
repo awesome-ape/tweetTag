@@ -15,8 +15,14 @@ from app.db.database import (
 # --------------------------------------------------
 # Load env
 # --------------------------------------------------
-base_dir = Path(__file__).resolve().parent.parent.parent
-load_dotenv(dotenv_path=base_dir / ".env")
+env_path = Path(__file__).resolve().parent.parent.parent / ".env"
+
+if env_path.exists():
+    # Local: Use your file
+    load_dotenv(dotenv_path=env_path)
+else:
+    # AWS: Skip the file and use the variables in the Console
+    load_dotenv()
 
 APIFY_API_TOKEN = os.getenv("APIFY_API_TOKEN")
 ACTOR_ID = "apidojo/tweet-scraper"
@@ -49,10 +55,7 @@ def parse_created_at(date_str: str) -> datetime:
     try:
         return datetime.fromisoformat(date_str.replace("Z", "+00:00"))
     except ValueError:
-        return datetime.strptime(
-            date_str,
-            "%a %b %d %H:%M:%S %z %Y"
-        )
+        return datetime.strptime(date_str, "%a %b %d %H:%M:%S %z %Y")
 
 
 async def fetch_and_store_tweets():
@@ -97,23 +100,20 @@ async def fetch_and_store_tweets():
             "category": None,
         }
 
-        
-        backup_docs.append({
-            **base_doc,
-            "raw": item,
-        })
+        backup_docs.append(
+            {
+                **base_doc,
+                "raw": item,
+            }
+        )
 
-       
         working_docs.append(base_doc)
 
     if working_docs:
         await backup_collection.insert_many(backup_docs)
         await working_collection.insert_many(working_docs)
 
-    print(
-        f"✅ Inserted {len(working_docs)} tweets "
-        f"to working & backup collections"
-    )
+    print(f"✅ Inserted {len(working_docs)} tweets to working & backup collections")
 
 
 if __name__ == "__main__":
