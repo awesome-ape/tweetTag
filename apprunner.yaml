@@ -24,4 +24,4 @@ run:
 
   secrets:
     - name: MONGO_URI
-      valueFrom: arn:aws:secretsmanager:eu-west-3:987596081913:secret:tweet-tag-mongo-url-agJTDN
+      value-from: arn:aws:secretsmanager:eu-west-3:987596081913:secret:tweet-tag-mongo-url-agJTDN
