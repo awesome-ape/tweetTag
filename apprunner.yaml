@@ -10,6 +10,8 @@ run:
     port: 8080
 
   env:
+    - name: MONGO_URI
+      value: "mongodb://example.invalid/test"
     - name: TIMEOUT_LIMIT
       value: "600"
     - name: TIMEOUT_LOCK_CHECK
@@ -18,7 +20,3 @@ run:
       value: "50"
     - name: APIFY_API_TOKEN
       value: apify_api_75mqO5UX7V3s9POSZXIEgsBpTrrB0D2j6nNV
-
-  secrets:
-    - name: MONGO_URI
-      value-from: "arn:aws:secretsmanager:eu-west-3:987596081913:secret:tweet-tag-mongo-url-plain-MRuWNf"
