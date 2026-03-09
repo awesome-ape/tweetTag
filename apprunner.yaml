@@ -15,7 +15,7 @@ run:
     port: 8080
   env:
     - name: MONGO_URI
-      value: placeholder
+      value: arn:aws:secretsmanager:eu-west-3:987596081913:secret:tweet-tag-mongo-url-agJTDN
 
     - name: TIMEOUT_LIMIT
       value: "600"
