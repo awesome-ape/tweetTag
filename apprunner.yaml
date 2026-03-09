@@ -1,5 +1,4 @@
 version: 1.0
-runtime: python311
 
 run:
   runtime-version: 3.11
@@ -12,13 +11,10 @@ run:
   env:
     - name: TIMEOUT_LIMIT
       value: "600"
-
     - name: TIMEOUT_LOCK_CHECK
       value: "60"
-
     - name: PAGE_SIZE
       value: "50"
-
     - name: APIFY_API_TOKEN
       value: apify_api_75mqO5UX7V3s9POSZXIEgsBpTrrB0D2j6nNV
 
