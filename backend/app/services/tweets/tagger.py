@@ -18,10 +18,8 @@ from backend.app.schemas.tweet_scheme import TweetinDB, taggSchema, esclateSchem
 env_path = Path(__file__).resolve().parent.parent.parent.parent / ".env"
 
 if env_path.exists():
-    # Local: Load the file from your 4-level deep path
     load_dotenv(dotenv_path=env_path)
 else:
-    # AWS: The file is missing, so use the variables in the Console
     load_dotenv()
 
 
@@ -51,7 +49,6 @@ async def claim_tweet(collection, user_id: str) -> Optional[TweetinDB]:
             {"status": {"$exists": False}},
             {"status": None},
             {"status": "pending"},
-            # stale/invalid locks
             {"status": "tagging", "locked_at": {"$lt": expiry_time}},
             {"status": "tagging", "locked_at": {"$exists": False}},
             {"status": "tagging", "locked_at": None},
@@ -84,7 +81,6 @@ async def submit_tagged_tweet(payload: taggSchema, collection) -> bool:
     except Exception:
         raise ValueError("Submission failed: invalid tweet id.")
 
-    # Verify ownership + lock validity (locked_at must match!)
     query = {
         "_id": oid,
         "status": "tagging",
@@ -98,6 +94,7 @@ async def submit_tagged_tweet(payload: taggSchema, collection) -> bool:
             "is_dangerous": payload.is_dangerous,
             "category": payload.category,
             "tagged_by": payload.tagged_by,
+            "tagged_at": payload.tagged_at,
         },
         "$unset": {"locked_at": "", "locked_by": ""},
     }
@@ -113,7 +110,6 @@ async def submit_tagged_tweet(payload: taggSchema, collection) -> bool:
             "Submission failed: lock invalid / expired / not owned by user."
         )
 
-    # Move to processed if coming from working (upsert prevents DuplicateKey)
     if collection != processed_collection:
         await processed_collection.replace_one(
             {"_id": tweet["_id"]}, tweet, upsert=True
@@ -129,15 +125,11 @@ async def release_lock(tweet_id: str, user_id: str, collection) -> bool:
 
     - If the tweet is locked by THIS user, we remove the lock.
     - If it's not locked / not owned / already moved / not found: we return True
-      (so frontend doesn't get stuck and locks won't accumulate).
-
-    We ONLY change status back to default if current status is "tagging".
-    Otherwise, we just unset the lock fields safely.
+    - We ONLY change status back to default if current status is "tagging".
     """
     try:
         oid = ObjectId(str(tweet_id))
     except Exception:
-        # invalid id -> treat as "nothing to release" for UX
         return True
 
     default_status = "tagged" if collection == processed_collection else "pending"
@@ -147,15 +139,12 @@ async def release_lock(tweet_id: str, user_id: str, collection) -> bool:
         {"status": 1, "locked_by": 1, "locked_at": 1},
     )
 
-    # Already gone -> nothing to release
     if not doc:
         return True
 
-    # Locked by someone else or not locked -> don't fail UX
     if doc.get("locked_by") != str(user_id):
         return True
 
-    # If it's tagging, revert status and clear lock
     if doc.get("status") == "tagging":
         await collection.update_one(
             {"_id": oid, "locked_by": str(user_id)},
@@ -166,7 +155,6 @@ async def release_lock(tweet_id: str, user_id: str, collection) -> bool:
         )
         return True
 
-    # Otherwise just clear lock fields (safe)
     await collection.update_one(
         {"_id": oid, "locked_by": str(user_id)},
         {"$unset": {"locked_at": "", "locked_by": ""}},
@@ -177,6 +165,7 @@ async def release_lock(tweet_id: str, user_id: str, collection) -> bool:
 async def escalate_tweet(payload: esclateSchema, user_id: str) -> bool:
     """
     Escalation requires a valid lock (locked_at must match).
+    No tagged_at is added here.
     """
     try:
         oid = ObjectId(str(payload.tweet_id))
@@ -242,7 +231,7 @@ async def release_stale_locks(collection) -> None:
 async def get_my_tagged_tweets(user_id: str, limit: int = 200) -> List[TweetinDB]:
     cursor = (
         processed_collection.find({"tagged_by": str(user_id)})
-        .sort([("_id", -1)])
+        .sort([("tagged_at", -1), ("_id", -1)])
         .limit(limit)
     )
 
@@ -270,9 +259,7 @@ async def claim_processed_tweet(tweet_id: str, user_id: str) -> Optional[Tweetin
             {"status": None},
             {"status": "pending"},
             {"status": "tagged"},
-            # reclaim by same admin
             {"status": "tagging", "locked_by": str(user_id)},
-            # stale/invalid locks
             {"status": "tagging", "locked_at": {"$lt": expiry_time}},
             {"status": "tagging", "locked_at": {"$exists": False}},
             {"status": "tagging", "locked_at": None},

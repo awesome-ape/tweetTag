@@ -3,7 +3,6 @@ from fastapi import APIRouter, HTTPException, Depends
 from backend.app.db.database import working_collection
 from backend.app.db.database import processed_collection
 
-
 from backend.app.dependencies.auth import get_current_user
 from backend.app.schemas.tweet_scheme import (
     TweetinDB,
@@ -62,7 +61,7 @@ async def escalate_tweet_endpoint(
         raise HTTPException(status_code=401, detail="Unauthorized")
 
     try:
-        await tagger.escalate_tweet(payload, user_id=str(user_id))  # ✅ FIX
+        await tagger.escalate_tweet(payload, user_id=str(user_id))
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -120,7 +119,6 @@ async def claim_processed_tweet_endpoint(
     if not await is_admin(user_id):
         raise HTTPException(status_code=403, detail="Forbidden: Admins only")
 
-    # Change 'ok' to 'tweet' so the variable exists for the return
     tweet = await tagger.claim_processed_tweet(tweet_id, user_id)
 
     if not tweet:

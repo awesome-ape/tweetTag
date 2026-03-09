@@ -30,7 +30,6 @@ def _timeout_seconds() -> int:
 
 
 async def get_escalated_tweets(limit: int = 200) -> List[TweetinDB]:
-    # Better sorting: queued_at if exists, else _id
     cursor = (
         escalation_collection.find({})
         .sort([("queued_at", -1), ("_id", -1)])
@@ -59,9 +58,7 @@ async def claim_escalated_tweet(tweet_id: str, user_id: str) -> Optional[Tweetin
             {"status": {"$exists": False}},
             {"status": None},
             {"status": "pending"},
-            # reclaim by same admin
             {"status": "tagging", "locked_by": str(user_id)},
-            # stale/invalid locks
             {"status": "tagging", "locked_at": {"$lt": expiry_time}},
             {"status": "tagging", "locked_at": {"$exists": False}},
             {"status": "tagging", "locked_at": None},
@@ -81,6 +78,7 @@ async def claim_escalated_tweet(tweet_id: str, user_id: str) -> Optional[Tweetin
         update,
         return_document=ReturnDocument.AFTER,
     )
+
     return TweetinDB.from_mongo(doc) if doc else None
 
 
@@ -89,4 +87,5 @@ async def release_escalated_lock(tweet_id: str, user_id: str) -> bool:
 
 
 async def submit_escalated_tagged_tweet(payload: taggSchema) -> bool:
+    # tagged_at is added automatically by taggSchema / submit_tagged_tweet
     return await submit_tagged_tweet(payload, escalation_collection)

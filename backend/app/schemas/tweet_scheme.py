@@ -1,6 +1,10 @@
 from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, timezone
+
+
+def _now_utc() -> datetime:
+    return datetime.now(timezone.utc)
 
 
 class TweetSchema(BaseModel):
@@ -20,6 +24,7 @@ class TweetinDB(TweetSchema):
     locked_at: Optional[datetime] = None
     locked_by: Optional[str] = None
     tagged_by: Optional[str] = None
+    tagged_at: Optional[datetime] = None
     is_dangerous: Optional[bool] = None
     category: Optional[str] = None
 
@@ -44,6 +49,7 @@ class taggSchema(BaseModel):
     category: str
     tagged_by: str
     locked_at: datetime
+    tagged_at: datetime = Field(default_factory=_now_utc)
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -57,7 +63,6 @@ class taggSchemaFront(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
-# ✅ FIXED: locked_at is optional for release
 class esclateSchema(BaseModel):
     tweet_id: str
     locked_at: Optional[datetime] = None
