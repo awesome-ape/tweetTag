@@ -58,22 +58,19 @@ async def get_processed_tweets(page: int = 1) -> List[Tuple[TweetinDB, Optional[
         page = 1
 
     pipeline = [
-        {"$match": _tagged_query()},  # ✅ ONLY tagged
-        {"$sort": {"locked_at": -1}},
+        {"$match": _tagged_query()},
+        {"$sort": {"tagged_at": -1, "_id": -1}},
         {"$skip": (page - 1) * page_size},
         {"$limit": page_size},
-        # Normalize tagged_by -> ObjectId (supports: ObjectId / string / null)
         {
             "$addFields": {
                 "tagged_by_obj": {
                     "$switch": {
                         "branches": [
-                            # already ObjectId
                             {
                                 "case": {"$eq": [{"$type": "$tagged_by"}, "objectId"]},
                                 "then": "$tagged_by",
                             },
-                            # string ObjectId
                             {
                                 "case": {
                                     "$and": [
@@ -135,11 +132,9 @@ async def get_processed_tweets_paginated(page: int = 1) -> Dict[str, Any]:
 
     query = _tagged_query()
 
-    # ✅ total count of TAGGED only
     total = await processed_collection.count_documents(query)
     total_pages = max(1, math.ceil(total / page_size)) if total > 0 else 1
 
-    # If user asks for page beyond end, return empty items but keep metadata
     if page > total_pages:
         return {
             "items": [],
@@ -150,11 +145,10 @@ async def get_processed_tweets_paginated(page: int = 1) -> Dict[str, Any]:
         }
 
     pipeline = [
-        {"$match": query},  # ✅ ONLY tagged
-        {"$sort": {"locked_at": -1}},
+        {"$match": query},
+        {"$sort": {"tagged_at": -1, "_id": -1}},
         {"$skip": (page - 1) * page_size},
         {"$limit": page_size},
-        # Normalize tagged_by -> ObjectId (supports: ObjectId / string / null)
         {
             "$addFields": {
                 "tagged_by_obj": {
@@ -217,13 +211,9 @@ async def get_leaderboard() -> List[Dict]:
     """
     Returns:
     [{ "username": <str>, "total_processed": <int> }, ...]
-
-    NOTE: This currently counts ALL processed_collection docs with tagged_by set.
-    If you want leaderboard to count ONLY tagged tweets, we can add the same query filter.
     """
 
     pipeline = [
-        # Normalize tagged_by -> ObjectId for grouping (supports ObjectId/string/null)
         {
             "$addFields": {
                 "tagged_by_obj": {
@@ -251,7 +241,6 @@ async def get_leaderboard() -> List[Dict]:
         },
         {"$group": {"_id": "$tagged_by_obj", "total_processed": {"$sum": 1}}},
         {"$sort": {"total_processed": -1}},
-        # Lookup username
         {
             "$lookup": {
                 "from": "users",
@@ -261,7 +250,6 @@ async def get_leaderboard() -> List[Dict]:
             }
         },
         {"$unwind": {"path": "$user_info", "preserveNullAndEmptyArrays": True}},
-        # Project output (username not id)
         {
             "$project": {
                 "_id": 0,
@@ -286,7 +274,6 @@ async def get_header_data(user_id: str) -> Dict:
         {"tagged_by": uid_string}
     )
 
-    # Safe ObjectId conversion
     try:
         oid = ObjectId(uid_string)
     except Exception:

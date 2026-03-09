@@ -1,7 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 
 from backend.app.dependencies.auth import get_current_user
-from backend.app.schemas.tweet_scheme import TweetinDB, taggSchemaFront, taggSchema, esclateSchema
+from backend.app.schemas.tweet_scheme import (
+    TweetinDB,
+    taggSchemaFront,
+    taggSchema,
+    esclateSchema,
+)
 from backend.app.services.tweets import esclation
 from backend.app.services.users.users import is_admin
 
@@ -27,17 +32,25 @@ async def claim_escalated_tweet(tweet_id: str, current_user=Depends(get_current_
     if not await is_admin(user_id):
         raise HTTPException(status_code=403, detail="Forbidden: Admins only")
 
-    tweet = await esclation.claim_escalated_tweet(tweet_id=tweet_id, user_id=str(user_id))
+    tweet = await esclation.claim_escalated_tweet(
+        tweet_id=tweet_id,
+        user_id=str(user_id),
+    )
+
     if not tweet:
         raise HTTPException(
             status_code=404,
             detail="Tweet is not available (locked by another admin or not found).",
         )
+
     return tweet
 
 
 @router.post("/submit_escalated_tagged_tweet")
-async def submit_escalated_tagged_tweet(payload: taggSchemaFront, current_user=Depends(get_current_user)):
+async def submit_escalated_tagged_tweet(
+    payload: taggSchemaFront,
+    current_user=Depends(get_current_user),
+):
     user_id = current_user.get("_id")
     if not user_id:
         raise HTTPException(status_code=401, detail="Unauthorized")
@@ -61,7 +74,10 @@ async def submit_escalated_tagged_tweet(payload: taggSchemaFront, current_user=D
 
 
 @router.post("/release_escalated_lock")
-async def release_escalated_lock(payload: esclateSchema, current_user=Depends(get_current_user)):
+async def release_escalated_lock(
+    payload: esclateSchema,
+    current_user=Depends(get_current_user),
+):
     user_id = current_user.get("_id")
     if not user_id:
         raise HTTPException(status_code=401, detail="Unauthorized")
