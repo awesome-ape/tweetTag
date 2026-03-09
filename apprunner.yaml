@@ -1,6 +1,11 @@
 version: 1.0
 runtime: python311
 
+build:
+  commands:
+    build:
+      - echo "Build phase"
+
 run:
   runtime-version: 3.11
   pre-run:
@@ -8,15 +13,18 @@ run:
   command: python3 -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8080
   network:
     port: 8080
-
   env:
     - name: MONGO_URI
-      value: "mongodb://example.invalid/test"
+      value: mongodb+srv://yuvalco:QxLprn8FnonRfdDX@cluster0.vquudw5.mongodb.net/
+
     - name: TIMEOUT_LIMIT
       value: "600"
+
     - name: TIMEOUT_LOCK_CHECK
       value: "60"
+
     - name: PAGE_SIZE
       value: "50"
+
     - name: APIFY_API_TOKEN
       value: apify_api_75mqO5UX7V3s9POSZXIEgsBpTrrB0D2j6nNV
