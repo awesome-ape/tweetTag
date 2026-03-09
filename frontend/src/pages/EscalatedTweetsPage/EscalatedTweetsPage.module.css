@@ -76,7 +76,6 @@
   }
 }
 
-/* הופכים את הכרטיס ללחיץ בלי לשבור עיצוב של Tweet */
 .tweetButton {
   border: none;
   padding: 0;
