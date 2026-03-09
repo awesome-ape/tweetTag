@@ -3,10 +3,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 100px 20px 40px 20px;
+
 }
 
 .mainWrapper {
+  margin-top: 100px;
   background: var(--card-bg);
   border: 1px solid var(--border-soft);
   border-radius: 28px;
@@ -15,6 +16,7 @@
   width: min(900px, 95vw);
   display: flex;
   flex-direction: column;
+  padding: 20px 20px 40px 20px;
 }
 
 .container {
@@ -60,7 +62,7 @@
 }
 
 .catCard {
-  background: light-dark(rgba(0,0,0,0.03), rgba(255,255,255,0.05));
+  background: light-dark(rgba(0, 0, 0, 0.03), rgba(255, 255, 255, 0.05));
   border: 2px solid var(--border-soft);
   border-radius: 16px;
   padding: 18px 5px;

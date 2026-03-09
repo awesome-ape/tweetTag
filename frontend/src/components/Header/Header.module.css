@@ -1,8 +1,10 @@
 /* Header.module.css */
 .mainHeader {
   /* Changed from .main-header */
-  position: sticky;
+  position: static;
   /* Use fixed to keep it at the top while scrolling */
+  width: 100%;
+  margin-bottom: 50px;
   top: 0;
   left: 0;
   right: 0;
