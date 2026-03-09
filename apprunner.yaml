@@ -15,10 +15,7 @@ run:
     port: 8080
   env:
     - name: MONGO_URI
-      valueFrom:
-        secretKeyRef:
-          name: tweet-yag-mongo-url
-          key: MONGO_URI
+      value: placeholder
 
     - name: TIMEOUT_LIMIT
       value: "600"
