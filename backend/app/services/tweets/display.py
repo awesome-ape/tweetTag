@@ -126,7 +126,6 @@ async def get_processed_tweets_paginated(page: int = 1) -> Dict[str, Any]:
     }
     """
     page_size = _get_page_size()
-    page_size = 100
     if page < 1:
         page = 1
 
@@ -134,6 +133,7 @@ async def get_processed_tweets_paginated(page: int = 1) -> Dict[str, Any]:
 
     total = await processed_collection.count_documents(query)
     total_pages = max(1, math.ceil(total / page_size)) if total > 0 else 1
+    print(f"DEBUG: Total from DB: {total}, Page Size: {page_size}")
 
     if page > total_pages:
         return {
