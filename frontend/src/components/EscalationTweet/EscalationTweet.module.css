@@ -23,3 +23,15 @@
   word-break: break-word;
   margin: 0;
 }
+
+.tweetScroll {
+  max-height: 340px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.tweetText {
+  white-space: pre-wrap;
+  word-break: break-word;
+  unicode-bidi: plaintext;
+}

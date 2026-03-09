@@ -33,7 +33,7 @@ function EscalationTweet({ tweet }) {
         {typeof raw === "object" ? (
           <pre className={styles.tweetText}>{text}</pre>
         ) : (
-          <div className={styles.tweetText}>{text}</div>
+          <div className={styles.tweetText }dir="auto">{text}</div>
         )}
       </div>
     </div>
