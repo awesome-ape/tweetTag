@@ -1,7 +1,7 @@
 /* Header.module.css */
 .mainHeader {
   /* Changed from .main-header */
-  position: fixed;
+  position: sticky;
   /* Use fixed to keep it at the top while scrolling */
   top: 0;
   left: 0;
