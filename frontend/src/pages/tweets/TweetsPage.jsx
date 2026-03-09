@@ -201,8 +201,11 @@ export default function TweetsPage() {
   };
 
   const submitAndHome = async () => {
-    if (await submit()) navigate("/home");
-  };
+  if (await submit()) {
+    const isAdmin = localStorage.getItem("isADMIN") === "true";
+    navigate(isAdmin ? "/home" : "/home-user");
+  }
+};
 
   const submitAndNext = async () => {
     if (await submit()) fetchSingleTweet();
