@@ -34,7 +34,7 @@ export default function TaggedTweetCard({ tweet }) {
         </div>
       </div>
 
-      <div className={styles.text}>{tweet.content || "No content"}</div>
+      <div className={styles.text} dir="auto">{tweet.content || "No content" } </div>
 
       <div className={styles.divider} />
 

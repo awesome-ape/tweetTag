@@ -102,7 +102,6 @@ export default function TaggedTweetsPage() {
         }
         return pair;
       })
-      .filter(isTaggedTweet);
   }, [rawItems]);
 
   const pageNumbers = useMemo(

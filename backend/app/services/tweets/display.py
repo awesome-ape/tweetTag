@@ -129,6 +129,7 @@ async def get_processed_tweets_paginated(page: int = 1) -> Dict[str, Any]:
     }
     """
     page_size = _get_page_size()
+    page_size = 100
     if page < 1:
         page = 1
 
