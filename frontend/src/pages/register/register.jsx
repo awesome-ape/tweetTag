@@ -24,7 +24,7 @@ export default function RegisterPage() {
   };
 
   const handleAction = async () => {
-    const serverUrl = import.meta.env.VITE_SERVER_URL;
+    const serverUrl = import.meta.env.VITE_SERVER_URL || "https://em5epzymak.eu-west-3.awsapprunner.com";
     const url = `${serverUrl}/auth/register`;
      if(!formData.password){
         const error = "please fill in you'r passowrd"
