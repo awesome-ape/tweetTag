@@ -15,7 +15,10 @@ run:
     port: 8080
   env:
     - name: MONGO_URI
-      value: mongodb+srv://yuvalco:QxLprn8FnonRfdDX@cluster0.vquudw5.mongodb.net/
+      valueFrom:
+        secretKeyRef:
+          name: tweet-yag-mongo-url
+          key: MONGO_URI
 
     - name: TIMEOUT_LIMIT
       value: "600"
