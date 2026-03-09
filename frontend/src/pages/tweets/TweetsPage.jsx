@@ -24,7 +24,7 @@ export default function TweetsPage() {
   // timer anchor
   const [receivedAt, setReceivedAt] = useState(null);
 
-  const serverUrl = import.meta.env.VITE_SERVER_URL || "http://127.0.0.1:8000";
+  const serverUrl = import.meta.env.VITE_SERVER_URL || "https://em5epzymak.eu-west-3.awsapprunner.com";
 
   const token = localStorage.getItem("token");
 

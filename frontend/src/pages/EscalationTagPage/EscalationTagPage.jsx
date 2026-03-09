@@ -55,7 +55,7 @@ export default function EscalationTagPage() {
 
   const [receivedAt, setReceivedAt] = useState(null);
 
-  const serverUrl = import.meta.env.VITE_SERVER_URL || "http://127.0.0.1:8000";
+  const serverUrl = import.meta.env.VITE_SERVER_URL || "https://em5epzymak.eu-west-3.awsapprunner.com";
 
   // ✅ stable refs (avoid hook loops + keep last lock info)
   const tweetIdRef = useRef(null);

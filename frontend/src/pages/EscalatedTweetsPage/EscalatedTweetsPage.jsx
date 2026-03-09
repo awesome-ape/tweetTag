@@ -11,7 +11,7 @@ export default function EscalatedTweetsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const serverUrl = import.meta.env.VITE_SERVER_URL || "http://127.0.0.1:8000";
+  const serverUrl = import.meta.env.VITE_SERVER_URL || "https://em5epzymak.eu-west-3.awsapprunner.com";
 
   const fetchEscalatedTweets = async () => {
     setLoading(true);

@@ -45,7 +45,7 @@ export default function Login() {
     if (!password) return triggerError("Please fill in your password");
 
     const serverUrl =
-      import.meta.env.VITE_SERVER_URL || "http://127.0.0.1:8000";
+      import.meta.env.VITE_SERVER_URL || "https://em5epzymak.eu-west-3.awsapprunner.com";
     const url = `${serverUrl}/auth/login`;
 
     setLoading(true);

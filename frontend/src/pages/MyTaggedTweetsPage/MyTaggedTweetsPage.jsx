@@ -6,7 +6,7 @@ import styles from "./MyTaggedTweetsPage.module.css";
 
 export default function MyTaggedTweetsPage() {
   const navigate = useNavigate();
-  const serverUrl = import.meta.env.VITE_SERVER_URL || "http://127.0.0.1:8000";
+  const serverUrl = import.meta.env.VITE_SERVER_URL || "https://em5epzymak.eu-west-3.awsapprunner.com";
 
   const [tweets, setTweets] = useState([]);
   const [loading, setLoading] = useState(true);
