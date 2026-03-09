@@ -1,12 +1,15 @@
 /* Header.module.css */
-.mainHeader { /* Changed from .main-header */
-  position: fixed; /* Use fixed to keep it at the top while scrolling */
+.mainHeader {
+  /* Changed from .main-header */
+  position: fixed;
+  /* Use fixed to keep it at the top while scrolling */
   top: 0;
   left: 0;
   right: 0;
   height: 60px;
   background-color: var(--header-bg);
-  color: var(--nav-text); /* Use your index.css variable */
+  color: var(--nav-text);
+  /* Use your index.css variable */
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -15,13 +18,15 @@
   z-index: 1000;
 }
 
-.navLeft { /* Changed from .nav-left */
+.navLeft {
+  /* Changed from .nav-left */
   font-weight: 600;
   font-size: 18px;
   letter-spacing: 1px;
 }
 
-.navRight { /* Changed from .nav-right */
+.navRight {
+  /* Changed from .nav-right */
   display: flex;
   align-items: center;
   gap: 20px;
@@ -32,8 +37,10 @@
   opacity: 0.8;
 }
 
-.logoutBtn { /* Changed from .logout-btn */
-  background-color: var(--danger); /* Use your index.css variable */
+.logoutBtn {
+  /* Changed from .logout-btn */
+  background-color: var(--danger);
+  /* Use your index.css variable */
   border: none;
   padding: 8px 16px;
   color: white;
@@ -42,4 +49,67 @@
   font-size: 14px;
   font-weight: 500;
   transition: all 0.25s ease;
+}
+
+
+@media (max-width: 900px) {
+  .mainHeader {
+    height: auto;
+    min-height: 60px;
+    padding: 10px 16px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .navLeft {
+    font-size: 16px;
+    letter-spacing: 0.5px;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .navRight {
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .username {
+    font-size: 13px;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .logoutBtn {
+    padding: 7px 12px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 560px) {
+  .mainHeader {
+    align-items: stretch;
+    padding: 10px 12px;
+  }
+
+  .navLeft {
+    width: 100%;
+    text-align: center;
+    font-size: 15px;
+  }
+
+  .navRight {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .username {
+    max-width: 55%;
+  }
+
+  .logoutBtn {
+    padding: 7px 10px;
+  }
 }
