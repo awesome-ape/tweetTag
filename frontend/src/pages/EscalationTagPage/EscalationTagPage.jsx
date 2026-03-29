@@ -55,25 +55,25 @@ export default function EscalationTagPage() {
 
   const [receivedAt, setReceivedAt] = useState(null);
 
-  const serverUrl = import.meta.env.VITE_SERVER_URL || "https://em5epzymak.eu-west-3.awsapprunner.com";
+  const serverUrl =
+    import.meta.env.VITE_SERVER_URL ||
+    "https://em5epzymak.eu-west-3.awsapprunner.com";
 
-  // ✅ stable refs (avoid hook loops + keep last lock info)
   const tweetIdRef = useRef(null);
   const lockedAtRef = useRef(null);
-  const isReleasingRef = useRef(false); // prevent concurrent release spam
+  const isReleasingRef = useRef(false);
   const initialClaimDoneRef = useRef(false);
 
   const releaseEscalationLock = useCallback(async () => {
     const id = tweetIdRef.current;
     if (!id) return;
 
-    if (isReleasingRef.current) return; // prevent spamming
+    if (isReleasingRef.current) return;
     isReleasingRef.current = true;
 
     try {
       const payload = { tweet_id: id };
 
-      // ✅ send locked_at only if we have it (schema now allows optional)
       if (lockedAtRef.current) payload.locked_at = lockedAtRef.current;
 
       const res = await fetch(`${serverUrl}/release_escalated_lock`, {
@@ -85,7 +85,6 @@ export default function EscalationTagPage() {
         body: JSON.stringify(payload),
       });
 
-      // If backend returns 400 because it was already released / not locked, don't spam errors
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         console.warn("releaseEscalationLock:", res.status, data?.detail || "failed");
@@ -139,7 +138,6 @@ export default function EscalationTagPage() {
     [navigate, serverUrl]
   );
 
-  // ✅ initial claim once (prevents double-claim loops)
   useEffect(() => {
     const id = passedTweet?._id || passedTweet?.id;
     if (!id) {
@@ -152,15 +150,12 @@ export default function EscalationTagPage() {
     claimEscalated(id);
   }, [passedTweet, claimEscalated, navigate]);
 
-  // ✅ release lock on unmount
   useEffect(() => {
     return () => {
-      // fire-and-forget
       if (tweetIdRef.current) releaseEscalationLock();
     };
   }, [releaseEscalationLock]);
 
-  // Timer logic (10 minutes)
   useEffect(() => {
     if (!receivedAt || errorMsg) return;
 
@@ -171,7 +166,6 @@ export default function EscalationTagPage() {
 
         await releaseEscalationLock();
 
-        // clear local state so UI doesn't flicker
         setTweet(null);
         tweetIdRef.current = null;
         lockedAtRef.current = null;
@@ -188,7 +182,7 @@ export default function EscalationTagPage() {
     if (errorMsg === TIMEOUT_MSG) {
       const id = passedTweet?._id || passedTweet?.id;
       if (id) {
-        initialClaimDoneRef.current = false; // allow re-claim
+        initialClaimDoneRef.current = false;
         claimEscalated(id);
       } else {
         navigate("/escalation");
@@ -200,6 +194,7 @@ export default function EscalationTagPage() {
 
   const setDanger = (bool) =>
     setIsDangerous((prev) => (prev === bool ? null : bool));
+
   const handleCategory = (cat) =>
     setCategory((prev) => (prev === cat ? null : cat));
 
@@ -230,7 +225,7 @@ export default function EscalationTagPage() {
         },
         body: JSON.stringify({
           tweet_id: tweetId,
-          locked_at: tweet.locked_at, // comes from claim
+          locked_at: tweet.locked_at,
           category,
           is_dangerous: isDangerous,
         }),
@@ -243,7 +238,6 @@ export default function EscalationTagPage() {
         return false;
       }
 
-      // after submit, you no longer hold the lock
       setTweet(null);
       setReceivedAt(null);
       tweetIdRef.current = null;
@@ -295,24 +289,25 @@ export default function EscalationTagPage() {
           <div className={styles.controls}>
             <div className={styles.sectionHeader}>Risk Assessment</div>
             <div className={styles.riskActions}>
-              <Button
-                className={`${styles.riskBtn} ${
-                  isDangerous === false ? styles.active : styles.safe
-                }`}
-                onClick={() => setDanger(false)}
-                disabled={!tweet}
-              >
-                Safe
-              </Button>
-              <Button
-                className={`${styles.riskBtn} ${
-                  isDangerous === true ? styles.active : styles.danger
-                }`}
-                onClick={() => setDanger(true)}
-                disabled={!tweet}
-              >
-                Danger
-              </Button>
+            <Button
+  className={`${styles.riskBtn} ${styles.safe} ${
+    isDangerous === false ? styles.riskActive : ""
+  }`}
+  onClick={() => setDanger(false)}
+  disabled={!tweet}
+>
+  Safe
+</Button>
+
+<Button
+  className={`${styles.riskBtn} ${styles.danger} ${
+    isDangerous === true ? styles.riskActive : ""
+  }`}
+  onClick={() => setDanger(true)}
+  disabled={!tweet}
+>
+  Danger
+</Button>
             </div>
 
             <div className={styles.sectionHeader}>Category</div>
@@ -320,12 +315,18 @@ export default function EscalationTagPage() {
               {["Oil", "Electricity", "Gas", "Unrelated"].map((cat) => (
                 <button
                   key={cat}
-                  className={`${styles.catCard} ${category === cat ? styles.active : ""}`}
+                  className={`${styles.catCard} ${
+                    category === cat ? styles.active : ""
+                  }`}
                   onClick={() => handleCategory(cat)}
                   disabled={!tweet}
                   type="button"
                 >
-                  {cat === "Electricity" ? "Electric" : cat === "Unrelated" ? "Other" : cat}
+                  {cat === "Electricity"
+                    ? "Electric"
+                    : cat === "Unrelated"
+                    ? "Other"
+                    : cat}
                 </button>
               ))}
             </div>

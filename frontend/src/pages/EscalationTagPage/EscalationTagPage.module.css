@@ -3,13 +3,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+
   background: transparent;
   color: var(--text-color);
 }
 
 .mainWrapper {
   margin-top: 100px;
-  padding: 20px 20px 40px 20px;
   background: var(--card-bg);
   border: 1px solid var(--border-soft);
   border-radius: 28px;
@@ -18,6 +18,7 @@
   width: min(900px, 95vw);
   display: flex;
   flex-direction: column;
+  padding: 20px 20px 40px 20px;
 }
 
 .container {
@@ -31,6 +32,34 @@
   width: 100%;
 }
 
+/* Tweet Card Styles */
+.tweetCard {
+  background: var(--surface-2);
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  padding: 24px;
+  position: relative;
+}
+
+.tweetDate {
+  font-size: 0.8rem;
+  opacity: 0.6;
+  margin-bottom: 12px;
+}
+
+.tweetScroll {
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.tweetText {
+  font-size: 1.15rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  margin: 0;
+}
+
 .sectionHeader {
   font-size: 0.75rem;
   font-weight: 800;
@@ -39,6 +68,7 @@
   text-transform: uppercase;
   letter-spacing: 1.5px;
   margin-top: 10px;
+  margin-bottom: 8px;
 }
 
 .riskActions {
@@ -47,19 +77,23 @@
   width: 100%;
 }
 
-/* keep this generic; colors come from .safe/.danger/.escalate or your button component */
 .riskBtn {
   flex: 1;
   padding: 14px;
   font-weight: 700;
   border-radius: 12px !important;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  transition: all 0.2s ease;
+  border: 2px solid transparent !important;
 }
-
 .riskBtn:hover {
   transform: translateY(-1px);
   box-shadow: var(--shadow-card);
+}
+
+.riskBtn:active {
+  transform: translateY(2px) scale(0.98);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2) inset;
 }
 
 .categoryGrid {
@@ -69,8 +103,7 @@
 }
 
 .catCard {
-  /* mimic the light surface tint using existing vars */
-  background: var(--card-bg);
+  background: var(--surface-2);
   border: 2px solid var(--border-soft);
   border-radius: 16px;
   padding: 18px 5px;
@@ -78,7 +111,7 @@
   font-weight: 700;
   color: var(--text-color);
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .catCard:hover {
@@ -87,16 +120,26 @@
   box-shadow: var(--shadow-card);
 }
 
-/* Highlighted state */
 .active {
-  background: var(--selected-cat-bg) !important;
-  color: var(--selected-cat-text) !important;
-  border-color: var(--selected-cat-bg) !important;
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-card);
+  background-color: transparent !important;
+  color: var(--selected-cat-bg) !important;
+  border: 2px solid var(--selected-cat-bg) !important;
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,0.05),
+    0 0 6px var(--selected-cat-bg) !important;
+  transform: translateY(1px) scale(0.98);
 }
 
-/* nav actions row */
+.riskActive {
+  background-color: transparent !important;
+  color: var(--selected-cat-bg) !important;
+  border: 2px solid var(--selected-cat-bg) !important;
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,0.05),
+    0 0 6px var(--selected-cat-bg);
+  transform: translateY(1px) scale(0.98);
+}
+
 .navActions {
   display: flex;
   gap: 12px;
@@ -109,7 +152,6 @@
   flex: 1;
 }
 
-/* risk buttons colors */
 .safe {
   background: var(--safe);
   border-color: var(--safe);
@@ -122,8 +164,10 @@
   color: var(--btn-text);
 }
 
-.escalate {
-  background: var(--escalate);
-  border-color: var(--escalate);
-  color: var(--btn-text);
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-weight: 600;
 }
