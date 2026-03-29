@@ -187,18 +187,25 @@ export default function EditTweetPage() {
           <div className={styles.controls}>
             <div className={styles.sectionHeader}>Risk Assessment</div>
             <div className={styles.riskActions}>
-              <Button
-                className={`${styles.riskBtn} ${isDangerous === false ? styles.active : styles.safe}`}
-                onClick={() => setIsDangerous(false)}
-              >
-                Safe
-              </Button>
-              <Button
-                className={`${styles.riskBtn} ${isDangerous === true ? styles.active : styles.danger}`}
-                onClick={() => setIsDangerous(true)}
-              >
-                Danger
-              </Button>
+             <button
+  type="button"
+  className={`${styles.riskBtn} ${styles.safe} ${
+    isDangerous === false ? styles.riskActive : ""
+  }`}
+  onClick={() => setIsDangerous(false)}
+>
+  Safe
+</button>
+
+<button
+  type="button"
+  className={`${styles.riskBtn} ${styles.danger} ${
+    isDangerous === true ? styles.riskActive : ""
+  }`}
+  onClick={() => setIsDangerous(true)}
+>
+  Danger
+</button>
             </div>
 
             <div className={styles.sectionHeader}>Category</div>

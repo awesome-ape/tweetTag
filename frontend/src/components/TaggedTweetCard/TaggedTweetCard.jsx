@@ -18,7 +18,7 @@ export default function TaggedTweetCard({ tweet }) {
       <div className={styles.topRow}>
         <div className={styles.metaLeft}>
           <div className={styles.author}>
-            {/* אצלך אין author, אז נציג uploaded_by */}
+            {/* */}
             <span>{tweet.uploaded_by || "Unknown uploader"}</span>
           </div>
 
@@ -49,14 +49,8 @@ export default function TaggedTweetCard({ tweet }) {
           <span className={styles.value}>{dangerLabel}</span>
         </div>
 
-        {/* ✅ פה התיקון: להציג username אם הגיע מהעמוד */}
-        <div className={styles.tagItem}>
-          <span className={styles.label}>tagged by</span>
-          <span className={styles.value}>
-            {tweet.tagged_by_username || tweet.tagged_by || "—"}
-          </span>
-        </div>
-
+        {/* */}
+       
         {tweet.locked_at ? (
           <div className={styles.tagItem}>
             <span className={styles.label}>locked at</span>

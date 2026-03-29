@@ -116,13 +116,14 @@
 }
 
 .active {
-  background: var(--selected-cat-bg) !important;
-  color: var(--selected-cat-text) !important;
-  border-color: var(--selected-cat-bg) !important;
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-card);
+  background-color: transparent !important;
+  color: var(--selected-cat-bg) !important;
+  border: 2px solid var(--selected-cat-bg) !important;
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,0.05),
+    0 0 6px var(--selected-cat-bg);
+  transform: translateY(1px) scale(0.98);
 }
-
 .navActions {
   display: flex;
   gap: 12px;
@@ -153,4 +154,13 @@
   align-items: center;
   height: 100vh;
   font-weight: 600;
+}
+.riskActive {
+  background-color: transparent !important;
+  color: var(--selected-cat-bg) !important;
+  border: 2px solid var(--selected-cat-bg) !important;
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,0.05),
+    0 0 6px var(--selected-cat-bg);
+  transform: translateY(1px) scale(0.98);
 }

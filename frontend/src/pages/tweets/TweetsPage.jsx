@@ -75,7 +75,6 @@ export default function TweetsPage() {
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        // 404 = אין ציוץ זמין, לא "שגיאה"
         if (res.status === 404) {
           setTweet(null);
           setTweetId(null);
@@ -227,7 +226,6 @@ export default function TweetsPage() {
       const data = await response.json().catch(() => ({}));
 
       if (response.ok) {
-        // אחרי escalation הציוץ עבר לקולקשן אחר ונמחק מה-working
         setTweet(null);
         setTweetId(null);
         setReceivedAt(null);
@@ -297,7 +295,7 @@ export default function TweetsPage() {
                 onClick={escalate}
                 disabled={!tweet}
               >
-                Escalate
+                Move to expert
               </Button>
             </div>
 
