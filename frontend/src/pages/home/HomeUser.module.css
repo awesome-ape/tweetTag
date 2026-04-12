@@ -1,6 +1,6 @@
 .page {
   position: relative;
-  min-height: 100vh;
+  min-height: 100%;
   overflow-x: hidden;
   background: transparent;
   color: var(--text-color);
@@ -14,10 +14,11 @@
 }
 
 .container {
+  margin-block-start: 100px;
   position: relative;
   z-index: 2;
 
-  min-height: 100vh;
+  min-height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -28,8 +29,9 @@
 }
 
 .card {
+
   width: 380px;
-  max-width: 95vw;
+  max-width: 95%;
   padding: 44px 32px;
 
   border: 1px solid var(--border-soft);
