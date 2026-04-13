@@ -18,7 +18,6 @@ export default function TaggedTweetCard({ tweet }) {
       <div className={styles.topRow}>
         <div className={styles.metaLeft}>
           <div className={styles.author}>
-            {/* */}
             <span>{tweet.uploaded_by || "Unknown uploader"}</span>
           </div>
 
@@ -34,7 +33,9 @@ export default function TaggedTweetCard({ tweet }) {
         </div>
       </div>
 
-      <div className={styles.text} dir="auto">{tweet.content || "No content" } </div>
+      <div className={styles.text} dir="auto">
+        {tweet.content || "No content"}
+      </div>
 
       <div className={styles.divider} />
 
@@ -49,8 +50,14 @@ export default function TaggedTweetCard({ tweet }) {
           <span className={styles.value}>{dangerLabel}</span>
         </div>
 
-        {/* */}
-       
+        {}
+        <div className={styles.tagItem}>
+          <span className={styles.label}>tagged by</span>
+          <span className={styles.value}>
+            {tweet.tagged_by_username || "Unknown"}
+          </span>
+        </div>
+
         {tweet.locked_at ? (
           <div className={styles.tagItem}>
             <span className={styles.label}>locked at</span>
