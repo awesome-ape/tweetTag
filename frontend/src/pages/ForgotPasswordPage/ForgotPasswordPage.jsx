@@ -88,18 +88,20 @@ export default function ForgotPasswordPage() {
             placeholder="Enter your email"
             onChange={(e) => setEmail(e.target.value)}
           />
-
+          <div className={styles.container}>
           <Button type="submit" disabled={loading}>
-            {loading ? "Sending..." : "Send reset link"}
+            {loading ? "Working..." : "continue"}
           </Button>
-        </form>
-
-        <button
+          <Button
           className={styles.back}
           onClick={() => navigate("/login")}
         >
           Back to login
-        </button>
+        </Button>
+        </div>
+        </form>
+
+        
       </div>
 
       {showError && (

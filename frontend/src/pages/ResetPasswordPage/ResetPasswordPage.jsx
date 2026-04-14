@@ -114,16 +114,18 @@ export default function ResetPasswordPage() {
               value={formData.confirm_password}
               onChange={handleChange}
             />
-
+              <div className={styles.container}>
             <Button type="submit" disabled={loading}>
               {loading ? "Updating..." : "Reset password"}
             </Button>
+             <Button className={styles.back} onClick={() => navigate("/login")}>
+          Back to login
+        </Button>
+        </div>
           </form>
         )}
 
-        <button className={styles.back} onClick={() => navigate("/login")}>
-          Back to login
-        </button>
+       
       </div>
 
       {showError && (
