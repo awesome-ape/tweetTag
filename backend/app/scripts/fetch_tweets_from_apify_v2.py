@@ -8,7 +8,6 @@ from apify_client import ApifyClient
 
 from app.db.database import (
     connect_to_mongo,
-    backup_collection,
     working_collection,
 )
 
@@ -18,40 +17,18 @@ from app.db.database import (
 env_path = Path(__file__).resolve().parent.parent.parent / ".env"
 
 if env_path.exists():
-    # Local: Use your file
     load_dotenv(dotenv_path=env_path)
 else:
-    # AWS: Skip the file and use the variables in the Console
     load_dotenv()
 
 APIFY_API_TOKEN = os.getenv("APIFY_API_TOKEN")
 ACTOR_ID = "apidojo/tweet-scraper"
-
-# --------------------------------------------------
-# Indicative keywords
-# --------------------------------------------------
-SEARCH_TERMS = [
-    "oil refinery",
-    "gas platform",
-    "energy infrastructure",
-    "power plant",
-    "electric grid",
-    "natural gas",
-    "pipeline",
-]
-
-MAX_ITEMS = 10
 
 
 # --------------------------------------------------
 # Helper: parse Twitter / ISO dates safely
 # --------------------------------------------------
 def parse_created_at(date_str: str) -> datetime:
-    """
-    Handles both:
-    - ISO format: 2026-02-01T22:04:24Z
-    - Twitter format: Sun Feb 01 22:04:24 +0000 2026
-    """
     try:
         return datetime.fromisoformat(date_str.replace("Z", "+00:00"))
     except ValueError:
@@ -61,15 +38,58 @@ def parse_created_at(date_str: str) -> datetime:
 async def fetch_and_store_tweets():
     await connect_to_mongo()
 
+    if not APIFY_API_TOKEN:
+        raise ValueError("APIFY_API_TOKEN is missing from environment variables")
+
     client = ApifyClient(APIFY_API_TOKEN)
 
     run_input = {
-        "searchTerms": SEARCH_TERMS,
-        "maxItems": MAX_ITEMS,
-        "sort": "Latest",
-        "tweetLanguage": "en",
-    }
+    "searchTerms": [
+        # ---------------- DIRECT EVENT ----------------
+        "(Rutenberg OR \"Rutenberg power station\" OR \"power plant Ashkelon\") AND (collapse OR collapsed OR structural failure)",
 
+        "(coal pier OR pier OR jetty) AND (collapse OR collapsed) AND (Rutenberg OR Ashkelon OR Israel)",
+
+        "(crane OR gantry crane) AND (collapsed OR collapse) AND (Rutenberg OR Ashkelon OR Israel)",
+
+
+        # ---------------- WEATHER CONTEXT ----------------
+        "(strong winds OR storm OR severe weather) AND (crane OR pier OR power plant) AND (Ashkelon OR Israel)",
+
+        "(storm OR high winds) AND (crane collapse OR pier collapse) AND (Rutenberg OR Ashkelon OR Israel)",
+
+
+        # ---------------- CASUALTIES / RESCUE ----------------
+        "(Rutenberg OR coal pier OR Ashkelon) AND (missing OR rescued OR injured OR casualties)",
+
+        "(worker OR workers) AND (missing OR rescued OR killed OR injured) AND (Rutenberg OR Ashkelon OR Israel)",
+
+        "(body found OR remains found) AND (Rutenberg OR coal pier OR crane OR Ashkelon)",
+
+
+        # ---------------- ELECTRICITY / INFRASTRUCTURE ----------------
+        "(power plant OR Israel Electric Corporation) AND (collapse OR accident OR incident) AND (Rutenberg OR Ashkelon OR Israel)",
+
+        "(energy infrastructure OR industrial facility) AND (collapse OR damage OR accident) AND (Rutenberg OR Ashkelon OR Israel)",
+
+
+        # ---------------- HUMAN STYLE ----------------
+        "crane collapse Ashkelon power plant",
+        "pier collapse Ashkelon",
+        "coal pier collapse Israel",
+        "accident at power plant Ashkelon",
+        "workers missing Ashkelon power plant",
+        "crane fell Ashkelon",
+    ],
+
+    "maxItems": 300,
+    "sort": "Latest",
+    "tweetLanguage": "en",
+
+    # 🎯 March 2023 with buffer
+    "startDate": "2023-03-01",
+    "endDate": "2023-05-01",
+}
     print("🚀 Running Tweet Scraper actor...")
     run = client.actor(ACTOR_ID).call(run_input=run_input)
     dataset_id = run["defaultDatasetId"]
@@ -77,7 +97,6 @@ async def fetch_and_store_tweets():
     items = client.dataset(dataset_id).list_items().items
     print(f"📥 Pulled {len(items)} tweets")
 
-    backup_docs = []
     working_docs = []
 
     for item in items:
@@ -89,31 +108,27 @@ async def fetch_and_store_tweets():
 
         created_at_dt = parse_created_at(created_at)
 
-        base_doc = {
+        doc = {
             "uploaded_by": "apify",
             "content": text,
             "created_at": created_at_dt,
             "status": "pending",
             "locked_at": None,
+            "locked_by": None,
             "tagged_by": None,
+            "tagged_at": None,
             "is_dangerous": None,
             "category": None,
         }
 
-        backup_docs.append(
-            {
-                **base_doc,
-                "raw": item,
-            }
-        )
+        working_docs.append(doc)
 
-        working_docs.append(base_doc)
+    if not working_docs:
+        print("⚠️ No valid tweets found in Apify response")
+        return
 
-    if working_docs:
-        await backup_collection.insert_many(backup_docs)
-        await working_collection.insert_many(working_docs)
-
-    print(f"✅ Inserted {len(working_docs)} tweets to working & backup collections")
+    result = await working_collection.insert_many(working_docs)
+    print(f"✅ Inserted {len(result.inserted_ids)} tweets into working")
 
 
 if __name__ == "__main__":

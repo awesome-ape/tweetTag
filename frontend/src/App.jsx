@@ -12,7 +12,8 @@ import EscalationTagPage from "./pages/EscalationTagPage/EscalationTagPage";
 import TaggingLeaderboardPage from "./pages/TaggingLeaderboardPage/TaggingLeaderboardPage"
 import MyTaggedTweetsPage from "./pages/MyTaggedTweetsPage/MyTaggedTweetsPage"
 import EditTweetPage from "./pages/EditTweetPage/EditTweetPage";
-
+import ForgotPasswordPage from "./pages/ForgotPasswordPage/ForgotPasswordPage.jsx";
+import ResetPasswordPage from "./pages/ResetPasswordPage/ResetPasswordPage.jsx";
 import "./index.css";
 
 function App() {
@@ -43,6 +44,8 @@ function App() {
             <Route path="/edit-tweet" element={<EditTweetPage />} />
              <Route path="/home" element={<Home />} />
                           <Route path="/home-user" element={<HomeUser />} />
+                            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                            <Route path="/reset-password" element={<ResetPasswordPage />} />
 
 
             

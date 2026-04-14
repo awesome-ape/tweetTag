@@ -127,11 +127,18 @@ export default function Login() {
           />
 
           <div className={styles["reg-container"]}>
-            <span>Don't have an account?</span>
-            <Link to="/register" className={styles["signup-link"]}>
-              Sign Up
-            </Link>
-          </div>
+  <span>Don't have an account?</span>
+  <Link to="/register" className={styles["signup-link"]}>
+    Sign Up
+  </Link>
+</div>
+
+{}
+<div className={styles["forgot-container"]}>
+  <Link to="/forgot-password" className={styles["forgot-link"]}>
+    Forgot password?
+  </Link>
+</div>
 
           <Button
             className={styles["btn-sub"]}
