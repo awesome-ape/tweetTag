@@ -54,7 +54,7 @@ export default function TaggedTweetCard({ tweet }) {
         <div className={styles.tagItem}>
           <span className={styles.label}>tagged by</span>
           <span className={styles.value}>
-            {tweet.tagged_by_username || "Unknown"}
+            {tweet.tagged_by_username || "Me"}
           </span>
         </div>
 
