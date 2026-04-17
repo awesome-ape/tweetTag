@@ -5,7 +5,7 @@ import Login from "./pages/login/login";
 import Register from "./pages/register/register";
 import Home from "./pages/home/Home";
 import HomeUser from "./pages/home/HomeUser";
-
+import AdminTaggingDistributionPage from "./pages/AdminTaggingDistributionPage/AdminTaggingDistributionPage";
 import TweetsPage from "./pages/tweets/TweetsPage";
 import TaggedTweetsPage from "./pages/TaggedTweetsPage/TaggedTweetsPage"; 
 import EscalationTagPage from "./pages/EscalationTagPage/EscalationTagPage";
@@ -15,7 +15,9 @@ import EditTweetPage from "./pages/EditTweetPage/EditTweetPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage/ForgotPasswordPage.jsx";
 import ResetPasswordPage from "./pages/ResetPasswordPage/ResetPasswordPage.jsx";
 import "./index.css";
-
+import AdminDailyTaggingStatsPage from "./pages/AdminDailyTaggingStatsPage/AdminDailyTaggingStatsPage";
+import UserImpactPage from "./pages/UserImpactPage/UserImpactPage";
+import AdminUserInsightsPage from "./pages/AdminUserInsightsPage/AdminUserInsightsPage";
 function App() {
   return (
     <Router>
@@ -42,10 +44,13 @@ function App() {
            <Route path="/table" element={<TaggingLeaderboardPage />} />
             <Route path="/tags" element={<MyTaggedTweetsPage/>} />
             <Route path="/edit-tweet" element={<EditTweetPage />} />
-             <Route path="/home" element={<Home />} />
                           <Route path="/home-user" element={<HomeUser />} />
                             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                             <Route path="/reset-password" element={<ResetPasswordPage />} />
+                            <Route path="/admin-daily-stats" element={<AdminDailyTaggingStatsPage />} />
+                            <Route path="/admin-tagging-distribution" element={<AdminTaggingDistributionPage />} />
+                            <Route path="/my-impact" element={<UserImpactPage />} />
+                            <Route path="/admin-user-insights" element={<AdminUserInsightsPage />} />
 
 
             

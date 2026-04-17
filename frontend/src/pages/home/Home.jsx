@@ -23,41 +23,70 @@ export default function Home() {
           <h2 className={styles.title}>TweetTag #</h2>
           <p className={styles.welcome}>hello {username}!</p>
 
-          <button
-            className={`${styles.btn} ${styles.btnDark}`}
-            onClick={() => navigate("/tweets")}
-          >
-            pull random tweet
-          </button>
+          <div className={styles.buttonGrid}>
+            <button
+              className={`${styles.btn} ${styles.btnDark}`}
+              onClick={() => navigate("/tweets")}
+            >
+              pull random tweet
+            </button>
 
-          <button
-            className={`${styles.btn} ${styles.btnMid}`}
-            onClick={() => navigate("/tags")}
-          >
-            view my tags
-          </button>
+            <button
+              className={`${styles.btn} ${styles.btnMid}`}
+              onClick={() => navigate("/tags")}
+            >
+              view my tags
+            </button>
 
-          {/* ✅ Admin-only buttons — always shown on this page */}
-          <button
-            className={`${styles.btn} ${styles.btnLight}`}
-            onClick={() => navigate("/tagged-tweets")}
-          >
-            view database
-          </button>
+            <button
+              className={`${styles.btn} ${styles.btnLight}`}
+              onClick={() => navigate("/my-impact")}
+            >
+              your impact
+            </button>
 
-          <button
-            className={`${styles.btn} ${styles.btnLight}`}
-            onClick={() => navigate("/escalation")}
-          >
-            tag escalated tweets
-          </button>
+            <button
+              className={`${styles.btn} ${styles.btnLight}`}
+              onClick={() => navigate("/tagged-tweets")}
+            >
+              view database
+            </button>
 
-          <button
-            className={`${styles.btn} ${styles.btnLight}`}
-            onClick={() => navigate("/table")}
-          >
-            Tagging Rankings
-          </button>
+            <button
+              className={`${styles.btn} ${styles.btnLight}`}
+              onClick={() => navigate("/escalation")}
+            >
+              tag escalated tweets
+            </button>
+
+            <button
+              className={`${styles.btn} ${styles.btnLight}`}
+              onClick={() => navigate("/table")}
+            >
+              tagging rankings
+            </button>
+
+            <button
+              className={`${styles.btn} ${styles.btnLight}`}
+              onClick={() => navigate("/admin-daily-stats")}
+            >
+              daily stats
+            </button>
+
+            <button
+              className={`${styles.btn} ${styles.btnLight}`}
+              onClick={() => navigate("/admin-tagging-distribution")}
+            >
+              distribution stats
+            </button>
+
+            <button
+              className={`${styles.btn} ${styles.btnLight} ${styles.fullWidthBtn}`}
+              onClick={() => navigate("/admin-user-insights")}
+            >
+              user insights
+            </button>
+          </div>
         </div>
       </div>
     </div>

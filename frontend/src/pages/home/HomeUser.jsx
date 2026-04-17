@@ -36,6 +36,12 @@ export default function HomeUser() {
           >
             view my tags
           </button>
+          <button
+            className={`${styles.btn} ${styles.btnSecondary}`}
+            onClick={() => navigate("/my-impact")}
+          >
+            my impact
+          </button>
         </div>
       </div>
     </div>

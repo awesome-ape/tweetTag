@@ -45,50 +45,44 @@ async def fetch_and_store_tweets():
 
     run_input = {
     "searchTerms": [
-        # ---------------- DIRECT EVENT ----------------
-        "(Rutenberg OR \"Rutenberg power station\" OR \"power plant Ashkelon\") AND (collapse OR collapsed OR structural failure)",
+        # ---------------- CORE ENTITY ----------------
+        "(EAPC OR \"Eilat Ashkelon Pipeline\" OR KATZA) AND (Israel OR Ashkelon OR Eilat)",
 
-        "(coal pier OR pier OR jetty) AND (collapse OR collapsed) AND (Rutenberg OR Ashkelon OR Israel)",
+        # ---------------- LEAK / FAILURE ----------------
+        "(EAPC OR \"oil pipeline\" OR \"fuel pipeline\") AND (leak OR oil spill OR fuel leak OR contamination) AND (Israel OR Ashkelon OR Eilat)",
 
-        "(crane OR gantry crane) AND (collapsed OR collapse) AND (Rutenberg OR Ashkelon OR Israel)",
+        "(pipeline OR oil pipeline OR fuel line) AND (rupture OR leak OR failure OR explosion) AND (EAPC OR Israel OR Ashkelon OR Eilat)",
 
+        # ---------------- FIRE / EXPLOSION ----------------
+        "(EAPC OR fuel terminal OR oil terminal) AND (fire OR explosion OR blaze) AND (Israel OR Ashkelon OR Eilat)",
 
-        # ---------------- WEATHER CONTEXT ----------------
-        "(strong winds OR storm OR severe weather) AND (crane OR pier OR power plant) AND (Ashkelon OR Israel)",
+        "(oil facility OR fuel storage OR industrial site) AND (fire OR explosion OR damage) AND (Ashkelon OR Eilat OR Israel)",
 
-        "(storm OR high winds) AND (crane collapse OR pier collapse) AND (Rutenberg OR Ashkelon OR Israel)",
+        # ---------------- INFRASTRUCTURE ----------------
+        "(EAPC OR oil infrastructure OR fuel infrastructure) AND (facility OR terminal OR port) AND (Israel OR Ashkelon OR Eilat)",
 
+        "(fuel terminal OR oil terminal OR storage facility) AND (failure OR damage OR incident) AND (Ashkelon OR Eilat OR Israel)",
 
-        # ---------------- CASUALTIES / RESCUE ----------------
-        "(Rutenberg OR coal pier OR Ashkelon) AND (missing OR rescued OR injured OR casualties)",
+        # ---------------- ENVIRONMENT ----------------
+        "(oil spill OR fuel spill OR marine pollution) AND (EAPC OR Israel OR Eilat OR Ashkelon)",
 
-        "(worker OR workers) AND (missing OR rescued OR killed OR injured) AND (Rutenberg OR Ashkelon OR Israel)",
-
-        "(body found OR remains found) AND (Rutenberg OR coal pier OR crane OR Ashkelon)",
-
-
-        # ---------------- ELECTRICITY / INFRASTRUCTURE ----------------
-        "(power plant OR Israel Electric Corporation) AND (collapse OR accident OR incident) AND (Rutenberg OR Ashkelon OR Israel)",
-
-        "(energy infrastructure OR industrial facility) AND (collapse OR damage OR accident) AND (Rutenberg OR Ashkelon OR Israel)",
-
+        "(environmental damage OR pollution) AND (oil OR fuel) AND (Eilat OR Red Sea OR Israel)",
 
         # ---------------- HUMAN STYLE ----------------
-        "crane collapse Ashkelon power plant",
-        "pier collapse Ashkelon",
-        "coal pier collapse Israel",
-        "accident at power plant Ashkelon",
-        "workers missing Ashkelon power plant",
-        "crane fell Ashkelon",
+        "oil spill Eilat Israel",
+        "fuel leak Ashkelon Israel",
+        "something happened at oil terminal Israel",
+        "strong fuel smell Eilat",
+        "fire at fuel facility Ashkelon Israel",
     ],
 
-    "maxItems": 300,
+    "maxItems": 200,
     "sort": "Latest",
     "tweetLanguage": "en",
 
-    # 🎯 March 2023 with buffer
-    "startDate": "2023-03-01",
-    "endDate": "2023-05-01",
+    # 🎯 last year
+    "startDate": "2025-04-01",
+    "endDate": "2026-04-14",
 }
     print("🚀 Running Tweet Scraper actor...")
     run = client.actor(ACTOR_ID).call(run_input=run_input)

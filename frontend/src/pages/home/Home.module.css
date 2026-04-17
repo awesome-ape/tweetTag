@@ -1,14 +1,11 @@
-/* ===== PAGE WRAPPER ===== */
 .page {
   position: relative;
-  min-height: 100%;
-  overflow-x: hidden;
+  height: 100vh;
+  overflow: hidden;
   background: transparent;
   color: var(--text-color);
 }
 
-/* ===== BACKGROUND  ===== */
-/* This covers the whole screen behind the content */
 .bg {
   position: fixed;
   inset: 0;
@@ -16,91 +13,116 @@
   pointer-events: none;
 }
 
-/* ===== MAIN CONTENT ===== */
 .container {
-  margin-block-start: 100px;
   position: relative;
   z-index: 2;
-
-  min-height: 100%;
+  height: calc(100vh - 80px);
   display: flex;
   justify-content: center;
   align-items: center;
-
-  /* Padding-top ensures the card doesn't hide under the fixed Header */
-  padding-top: 80px;
-  padding-left: 20px;
-  padding-right: 20px;
+  padding: 88px 20px 16px;
+  box-sizing: border-box;
 }
 
-/* ===== CARD ===== */
 .card {
-  width: 380px;
-  max-width: 95%;
-  padding: 40px 30px;
-
+  width: min(760px, 100%);
+  padding: 24px 24px;
   border: 1px solid var(--border-soft);
   border-radius: 18px;
   text-align: center;
-
   background: var(--card-bg);
   box-shadow: var(--shadow-card);
-
   position: relative;
   z-index: 3;
 }
 
 .title {
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   font-size: 2rem;
   color: var(--text-color);
 }
 
 .welcome {
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   font-size: 1rem;
   opacity: 0.9;
   color: var(--text-color);
 }
 
-/* ===== BUTTONS ===== */
+.buttonGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
 .btn {
   width: 100%;
-  padding: 12px;
-  margin-bottom: 15px;
+  min-height: 50px;
+  padding: 10px 12px;
   border: none;
   border-radius: 12px;
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
 }
 
-/* Primary Action - Uses your CSS Variable */
 .btnDark {
   background-color: var(--accent-color);
   color: var(--btn-text);
 }
 
-/* Secondary Action - Tweeter Blue */
 .btnMid {
   background-color: var(--tweeter-blue);
   color: var(--btn-text);
 }
 
-/* Tertiary Action */
 .btnLight {
   background-color: var(--accent-color);
   color: var(--btn-text);
   opacity: 0.8;
 }
 
+.fullWidthBtn {
+  grid-column: 1 / -1;
+}
+
 .btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
   opacity: 1;
 }
 
 .btn:active {
-  transform: translateY(-1px);
+  transform: translateY(0);
+}
+
+@media (max-width: 640px) {
+  .page {
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;
+  }
+
+  .container {
+    height: auto;
+    min-height: calc(100vh - 80px);
+    padding: 96px 16px 20px;
+    align-items: flex-start;
+  }
+
+  .card {
+    padding: 22px 16px;
+  }
+
+  .title {
+    font-size: 1.85rem;
+  }
+
+  .buttonGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .fullWidthBtn {
+    grid-column: auto;
+  }
 }
