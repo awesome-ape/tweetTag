@@ -99,7 +99,7 @@ async def forgot_password(email: str):
 
     await password_reset_tokens_collection.insert_one(reset_doc)
 
-    frontend_url = os.getenv("FRONTEND_URL", "https://em5epzymak.eu-west-3.awsapprunner.com")
+    frontend_url = os.getenv("FRONTEND_URL", "https://main.d2oqwmp8m9aqey.amplifyapp.com")
     reset_link = f"{frontend_url}/reset-password?token={token}"
 
     email_result = await send_reset_link(email, reset_link)
