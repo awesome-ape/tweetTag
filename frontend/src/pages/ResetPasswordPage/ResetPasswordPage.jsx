@@ -1,57 +1,53 @@
-import React, { useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import Input from "../../components/Input/Input.jsx";
-import Button from "../../components/Button/Button.jsx";
-import ErrorModal from "../../components/ErrorModal/ErrorModal.jsx";
+import React, { useState } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import ThemeToggle from "../../components/ThemeToggle/ThemeToggle.jsx";
 import styles from "./ResetPasswordPage.module.css";
 
 export default function ResetPasswordPage() {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
-  const token = useMemo(() => searchParams.get("token") || "", [searchParams]);
+  const token = searchParams.get("token") || "";
 
-  const [formData, setFormData] = useState({
-    new_password: "",
-    confirm_password: "",
-  });
-
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showError, setShowError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [success, setSuccess] = useState(false);
 
-  const triggerError = (msg) => {
-    setErrorMessage(msg);
-    setShowError(true);
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (loading) return;
-
-    const { new_password, confirm_password } = formData;
-
-    if (!token) return triggerError("Missing token");
-    if (!new_password) return triggerError("Enter new password");
-    if (new_password.length < 6)
-      return triggerError("Password must be at least 6 characters");
-    if (new_password !== confirm_password)
-      return triggerError("Passwords do not match");
-
-    const serverUrl =
+  const serverUrl =
       import.meta.env.VITE_SERVER_URL ||
       "https://em5epzymak.eu-west-3.awsapprunner.com";
 
-    setLoading(true);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setMessage("");
+
+    if (!token) {
+      setError("No reset token received.");
+      return;
+    }
+
+    if (!newPassword.trim()) {
+      setError("Please enter a new password.");
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setError("Password must be at least 6 characters long.");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
 
     try {
+      setLoading(true);
+
       const response = await fetch(`${serverUrl}/auth/reset-password`, {
         method: "POST",
         headers: {
@@ -59,28 +55,23 @@ export default function ResetPasswordPage() {
         },
         body: JSON.stringify({
           token,
-          new_password,
+          new_password: newPassword,
         }),
       });
 
-      const data = await response.json().catch(() => ({}));
+      const data = await response.json();
 
       if (!response.ok) {
-        const msg =
-          Array.isArray(data?.detail)
-            ? data.detail?.[0]?.msg || "Reset failed."
-            : data?.detail || "Reset failed.";
-        triggerError(msg);
-        return;
+        throw new Error(data.detail || "Failed to reset password");
       }
 
-      setSuccess(true);
+      setMessage(data.message || "Password changed successfully");
 
       setTimeout(() => {
         navigate("/login");
       }, 1500);
     } catch (err) {
-      triggerError("Server error");
+      setError(err.message || "Something went wrong.");
     } finally {
       setLoading(false);
     }
@@ -88,49 +79,59 @@ export default function ResetPasswordPage() {
 
   return (
     <div className="app-wrapper">
-      <div style={{ position: "fixed", top: 20, right: 20 }}>
+      <div style={{ position: "fixed", top: 20, right: 20, zIndex: 2000 }}>
         <ThemeToggle />
       </div>
 
-      <div className={styles.card}>
-        <h2 className={styles.title}>Reset Password</h2>
+      <div className={styles.page}>
+        <div className={styles.card}>
+          <h1 className={styles.title}>Reset Password</h1>
+          <p className={styles.subtitle}>
+            Enter your new password below to secure your account.
+          </p>
 
-        {success ? (
-          <div className={styles.success}>Password updated successfully</div>
-        ) : (
           <form onSubmit={handleSubmit} className={styles.form}>
-            <Input
-              name="new_password"
-              type="password"
-              placeholder="New password"
-              value={formData.new_password}
-              onChange={handleChange}
-            />
+            <div className={styles.field}>
+              <label htmlFor="newPassword">New Password</label>
+              <input
+                id="newPassword"
+                className={styles.input}
+                type="password"
+                placeholder="Enter new password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+            </div>
 
-            <Input
-              name="confirm_password"
-              type="password"
-              placeholder="Confirm password"
-              value={formData.confirm_password}
-              onChange={handleChange}
-            />
-              <div className={styles.container}>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Updating..." : "Reset password"}
-            </Button>
-             <Button className={styles.back} onClick={() => navigate("/login")}>
-          Back to login
-        </Button>
-        </div>
+            <div className={styles.field}>
+              <label htmlFor="confirmPassword">Confirm Password</label>
+              <input
+                id="confirmPassword"
+                className={styles.input}
+                type="password"
+                placeholder="Confirm new password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+            </div>
+
+            {error && <div className={styles.error}>{error}</div>}
+            {message && <div className={styles.message}>{message}</div>}
+
+            <button className={styles.button} type="submit" disabled={loading}>
+              {loading ? "Resetting..." : "Reset Password"}
+            </button>
+
+            <button
+              type="button"
+              className={styles.secondaryButton}
+              onClick={() => navigate("/login")}
+            >
+              Back to Login
+            </button>
           </form>
-        )}
-
-       
+        </div>
       </div>
-
-      {showError && (
-        <ErrorModal message={errorMessage} onClose={() => setShowError(false)} />
-      )}
     </div>
   );
 }

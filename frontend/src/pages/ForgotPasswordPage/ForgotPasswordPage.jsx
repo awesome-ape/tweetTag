@@ -13,6 +13,7 @@ export default function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const triggerError = (msg) => {
     setErrorMessage(msg);
@@ -31,6 +32,7 @@ export default function ForgotPasswordPage() {
       "https://em5epzymak.eu-west-3.awsapprunner.com";
 
     setLoading(true);
+    setSuccessMessage("");
 
     try {
       const response = await fetch(`${serverUrl}/auth/forgot-password`, {
@@ -52,18 +54,9 @@ export default function ForgotPasswordPage() {
         return;
       }
 
-      // 🔥 פה הקסם — לוקחים את הטוקן מהשרת ומעבירים לעמוד הבא
-      if (data?.reset_token_for_testing) {
-        navigate(
-          `/reset-password?token=${encodeURIComponent(
-            data.reset_token_for_testing
-          )}`
-        );
-        return;
-      }
-
-      // fallback (אם אין טוקן)
-      triggerError("Something went wrong. No reset token received.");
+      setSuccessMessage(
+        data?.message || "If an account with that email exists, a reset link has been sent."
+      );
     } catch (err) {
       triggerError("Could not connect to the server.");
     } finally {
@@ -88,24 +81,32 @@ export default function ForgotPasswordPage() {
             placeholder="Enter your email"
             onChange={(e) => setEmail(e.target.value)}
           />
-          <div className={styles.container}>
-          <Button type="submit" disabled={loading}>
-            {loading ? "Working..." : "continue"}
-          </Button>
-          <Button
-          className={styles.back}
-          onClick={() => navigate("/login")}
-        >
-          Back to login
-        </Button>
-        </div>
-        </form>
 
-        
+          {successMessage && (
+            <p className={styles.successMessage}>{successMessage}</p>
+          )}
+
+          <div className={styles.container}>
+            <Button type="submit" disabled={loading}>
+              {loading ? "Working..." : "Continue"}
+            </Button>
+
+            <Button
+              type="button"
+              className={styles.back}
+              onClick={() => navigate("/login")}
+            >
+              Back to login
+            </Button>
+          </div>
+        </form>
       </div>
 
       {showError && (
-        <ErrorModal message={errorMessage} onClose={() => setShowError(false)} />
+        <ErrorModal
+          message={errorMessage}
+          onClose={() => setShowError(false)}
+        />
       )}
     </div>
   );

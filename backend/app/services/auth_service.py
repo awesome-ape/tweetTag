@@ -1,9 +1,12 @@
+import os
 from datetime import datetime, timezone
+
 from bson import ObjectId
 from passlib.context import CryptContext
 
 from backend.app.db.database import users_collection, password_reset_tokens_collection
 from backend.app.schemas.user_schema import UserResponse
+from backend.app.services.email_service import send_reset_link
 from backend.app.services.jwt_service import (
     create_access_token,
     create_password_reset_token,
@@ -57,12 +60,17 @@ async def login_user(username: str, password: str):
 
     token = create_access_token(user_id=user["_id"])
 
-    return {"access_token": token, "token_type": "bearer", "user": UserResponse(**user)}
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "user": UserResponse(**user),
+    }
 
 
 async def forgot_password(email: str):
+    
     user = await users_collection.find_one({"email": email})
-
+    
     if not user:
         return {
             "message": "If an account with that email exists, a reset link has been sent."
@@ -72,7 +80,7 @@ async def forgot_password(email: str):
 
     await password_reset_tokens_collection.update_many(
         {"user_id": user_id, "used": False},
-        {"$set": {"used": True, "used_at": datetime.now(timezone.utc)}}
+        {"$set": {"used": True, "used_at": datetime.now(timezone.utc)}},
     )
 
     token, jti = create_password_reset_token(user_id)
@@ -91,15 +99,28 @@ async def forgot_password(email: str):
 
     await password_reset_tokens_collection.insert_one(reset_doc)
 
-    # זמנית לבדיקה, עד שתחליטי סופית איך לשלוח מייל
+    frontend_url = os.getenv("FRONTEND_URL", "https://em5epzymak.eu-west-3.awsapprunner.com")
+    reset_link = f"{frontend_url}/reset-password?token={token}"
+
+    email_result = await send_reset_link(email, reset_link)
+    print(email_result)
+
+    if email_result != "success":
+
+        raise ValueError(f"Failed to send reset email: {email_result}")
+
     return {
-        "message": "If an account with that email exists, a reset link has been sent.",
-        "reset_token_for_testing": token,
+        "message": "If an account with that email exists, a reset link has been sent."
     }
 
 
 async def reset_password(token: str, new_password: str):
+    print("RESET PASSWORD CALLED")
+    print("TOKEN:", token)
+    print("NEW PASSWORD:", new_password)
+
     payload = decode_password_reset_token(token)
+    print("PAYLOAD:", payload)
 
     user_id = payload["sub"]
     jti = payload["jti"]
@@ -111,6 +132,7 @@ async def reset_password(token: str, new_password: str):
             "used": False,
         }
     )
+    print("RESET RECORD:", reset_record)
 
     if not reset_record:
         raise ValueError("Invalid or already used reset token")
@@ -130,13 +152,19 @@ async def reset_password(token: str, new_password: str):
         raise ValueError("Invalid user id in token")
 
     user = await users_collection.find_one({"_id": oid})
+    print("USER FOUND:", user)
+
     if not user:
         raise ValueError("User not found")
 
-    await users_collection.update_one(
+    new_hashed_password = hash_password(new_password)
+    print("NEW HASH:", new_hashed_password)
+
+    result = await users_collection.update_one(
         {"_id": oid},
-        {"$set": {"password": hash_password(new_password)}}
+        {"$set": {"password": new_hashed_password}},
     )
+    print("UPDATE RESULT matched:", result.matched_count, "modified:", result.modified_count)
 
     await password_reset_tokens_collection.update_one(
         {"_id": reset_record["_id"]},
@@ -145,7 +173,7 @@ async def reset_password(token: str, new_password: str):
                 "used": True,
                 "used_at": now,
             }
-        }
+        },
     )
 
     return {"message": "Password has been reset successfully"}
