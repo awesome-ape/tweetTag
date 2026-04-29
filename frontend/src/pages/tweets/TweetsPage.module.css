@@ -1,103 +1,199 @@
+/* TweetsPage.module.css */
 .page {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
+  background: transparent;
+  color: var(--text-color);
+}
 
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-muted);
 }
 
 .mainWrapper {
-  margin-top: 100px;
+  margin-top: 32px;
+  margin-bottom: 40px;
   background: var(--card-bg);
-  border: 1px solid var(--border-soft);
-  border-radius: 28px;
-  padding: 40px;
+  border: 1.5px solid var(--border-soft);
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-card);
-  width: min(900px, 95vw);
-  display: flex;
-  flex-direction: column;
-  padding: 20px 20px 40px 20px;
+  width: min(860px, 95vw);
+  padding: 28px 28px 36px;
+  position: relative;
+  overflow: hidden;
+}
+
+.mainWrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #6366f1, #1d9bf0);
 }
 
 .container {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 25px;
+  gap: 22px;
 }
 
 .scrollableContent {
   width: 100%;
 }
 
-.sectionHeader {
-  font-size: 0.75rem;
-  font-weight: 800;
-  color: var(--text-color);
-  opacity: 0.5;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  margin-top: 10px;
+.error {
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--danger) 10%, var(--card-bg));
+  border: 1px solid color-mix(in srgb, var(--danger) 25%, var(--border-soft));
+  color: var(--danger);
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 
+/* Section labels */
+.sectionHeader {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  margin-bottom: 10px;
+}
+
+/* Risk buttons */
 .riskActions {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
 }
 
 .riskBtn {
   flex: 1;
-  padding: 14px;
+  padding: 14px 10px;
+  font-size: 0.9rem;
   font-weight: 700;
-  border-radius: 12px !important;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all 0.15s ease;
-
-  /* בסיס */
   border: 2px solid transparent;
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast),
+    border-color var(--transition-fast);
 }
 
-/* 👇 אפקט לחיצה (כולם) */
-.riskBtn:active {
-  transform: translateY(2px) scale(0.98);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2) inset;
+.riskBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
 }
+
+.riskBtn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.riskBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.safe {
+  background: color-mix(in srgb, var(--safe) 14%, var(--card-bg));
+  border-color: color-mix(in srgb, var(--safe) 35%, var(--border-soft));
+  color: var(--safe);
+}
+
+.safe:hover:not(:disabled) {
+  background: var(--safe) !important;
+  color: #ffffff !important;
+  border-color: var(--safe) !important;
+}
+
+.danger {
+  background: color-mix(in srgb, var(--danger) 14%, var(--card-bg));
+  border-color: color-mix(in srgb, var(--danger) 35%, var(--border-soft));
+  color: var(--danger);
+}
+
+.danger:hover:not(:disabled) {
+  background: var(--danger) !important;
+  color: #ffffff !important;
+  border-color: var(--danger) !important;
+}
+
+.escalate {
+  background: color-mix(in srgb, var(--escalate) 14%, var(--card-bg));
+  border-color: color-mix(in srgb, var(--escalate) 35%, var(--border-soft));
+  color: var(--escalate);
+}
+
+.escalate:hover:not(:disabled) {
+  background: var(--escalate) !important;
+  color: #ffffff !important;
+  border-color: var(--escalate) !important;
+}
+
+/* Active (selected) state */
+.active {
+  background: var(--selected-cat-bg) !important;
+  color: #ffffff !important;
+  border-color: var(--selected-cat-bg) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--selected-cat-bg) 28%, transparent);
+  transform: translateY(1px);
+}
+
+/* Category grid */
 .categoryGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  gap: 10px;
 }
 
 .catCard {
-  background: light-dark(rgba(0, 0, 0, 0.03), rgba(255, 255, 255, 0.05));
-  border: 2px solid var(--border-soft);
-  border-radius: 16px;
-  padding: 18px 5px;
+  background: var(--btn-secondary-bg);
+  border: 1.5px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  padding: 16px 8px;
   font-size: 0.85rem;
   font-weight: 700;
   color: var(--text-color);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition:
+    transform var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast),
+    color var(--transition-fast);
+  text-align: center;
 }
 
-/* Highlighted state */
-.active {
-  background-color: transparent !important; /* ❌ בלי מילוי */
-  
-  border: 2px solid var(--selected-cat-bg) !important; /* ✅ מסגרת כחולה */
-  color: var(--selected-cat-bg) !important;
-
-  box-shadow: 0 0 0 2px rgba(255,255,255,0.05),
-              0 0 6px var(--selected-cat-bg);
-
-  transform: translateY(1px);
+.catCard:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: var(--selected-cat-bg);
+  box-shadow: var(--shadow-soft);
 }
 
+.catCard:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Nav actions at bottom */
 .navActions {
   display: flex;
-  gap: 12px;
-  margin-top: 20px;
+  gap: 10px;
+  margin-top: 8px;
   padding-top: 20px;
   border-top: 1px solid var(--border-soft);
 }
@@ -106,20 +202,21 @@
   flex: 1;
 }
 
-.safe {
-  background-color: var(--safe);
-  border-color: var(--safe);
-  color: white;
-}
+@media (max-width: 600px) {
+  .mainWrapper {
+    padding: 22px 16px 28px;
+    margin-top: 20px;
+  }
 
-.danger {
-  background-color: var(--risk-high);
-  border-color: var(--risk-high);
-  color: white;
-}
+  .categoryGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 
-.escalate {
-  background-color: var(--escalate);
-  border-color: var(--escalate);
-  color: white;
+  .riskActions {
+    flex-direction: column;
+  }
+
+  .navActions {
+    flex-direction: column;
+  }
 }

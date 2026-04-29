@@ -1,14 +1,23 @@
+/* EscalationTweet.module.css */
 .card {
-  border: 1px solid var(--border-soft);
-  border-radius: 18px;
+  border: 1.5px solid var(--border-soft);
+  border-radius: var(--radius-lg);
   background: var(--card-bg);
+  box-shadow: var(--shadow-soft);
+  padding: 18px 20px;
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.card:hover {
   box-shadow: var(--shadow-card);
-  padding: 16px;
+  transform: translateY(-1px);
+  border-color: light-dark(rgba(215, 119, 6, 0.22), rgba(245, 158, 11, 0.22));
 }
 
 .date {
-  font-size: 0.85rem;
-  opacity: 0.75;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
   margin-bottom: 10px;
 }
 
@@ -16,22 +25,32 @@
   max-height: 340px;
   overflow-y: auto;
   padding-right: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-soft) transparent;
 }
 
-.content {
+.scrollContainer::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollContainer::-webkit-scrollbar-thumb {
+  background: var(--border-soft);
+  border-radius: 999px;
+}
+
+.content,
+.tweetText {
   white-space: pre-wrap;
   word-break: break-word;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-color);
   margin: 0;
+  unicode-bidi: plaintext;
 }
 
 .tweetScroll {
   max-height: 340px;
   overflow-y: auto;
   padding-right: 6px;
-}
-
-.tweetText {
-  white-space: pre-wrap;
-  word-break: break-word;
-  unicode-bidi: plaintext;
 }

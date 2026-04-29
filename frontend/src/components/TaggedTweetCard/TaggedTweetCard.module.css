@@ -1,11 +1,19 @@
+/* TaggedTweetCard.module.css */
 .card {
   width: 100%;
-  border: 1px solid var(--border-soft);
-  border-radius: 18px;
+  border: 1.5px solid var(--border-soft);
+  border-radius: var(--radius-lg);
   background: var(--card-bg);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-soft);
   color: var(--text-color);
-  padding: 18px;
+  padding: 18px 20px;
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-card);
+  transform: translateY(-1px);
+  border-color: light-dark(rgba(99, 102, 241, 0.18), rgba(129, 140, 248, 0.18));
 }
 
 .topRow {
@@ -18,13 +26,13 @@
 .metaLeft {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
   min-width: 0;
 }
 
 .author {
-  font-weight: 600;
-  font-size: 1rem;
+  font-weight: 700;
+  font-size: 0.95rem;
   display: flex;
   gap: 8px;
   align-items: baseline;
@@ -32,85 +40,89 @@
 }
 
 .username {
-  opacity: 0.8;
+  color: var(--text-muted);
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   white-space: nowrap;
 }
 
 .date {
-  font-size: 0.85rem;
-  opacity: 0.75;
+  font-size: 0.78rem;
+  color: var(--text-muted);
 }
 
 .metaRight {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .badge {
-  padding: 6px 10px;
+  padding: 4px 10px;
   border-radius: 999px;
   border: 1px solid var(--border-soft);
-  background: rgba(255, 255, 255, 0.04);
-  font-size: 0.85rem;
+  background: var(--btn-secondary-bg);
+  color: var(--text-color);
+  font-size: 0.78rem;
+  font-weight: 700;
   white-space: nowrap;
 }
 
 .link {
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   text-decoration: none;
   color: var(--accent-color);
   font-weight: 600;
 }
 
 .link:hover {
-  opacity: 0.9;
+  text-decoration: underline;
 }
 
 .text {
   margin-top: 12px;
-  font-size: 1rem;
-  line-height: 1.5;
+  font-size: 0.95rem;
+  line-height: 1.55;
   white-space: pre-wrap;
   word-break: break-word;
+  color: var(--text-color);
 }
 
 .divider {
   margin: 14px 0;
   height: 1px;
   background: var(--border-soft);
-  opacity: 0.7;
 }
 
 .tagsRow {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px 14px;
+  gap: 8px 12px;
 }
 
 .tagItem {
   display: flex;
   justify-content: space-between;
-  gap: 10px;
-  padding: 10px 12px;
-  border-radius: 12px;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-soft);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--surface-3);
 }
 
 .label {
-  font-size: 0.85rem;
-  opacity: 0.75;
+  font-size: 0.78rem;
+  color: var(--text-muted);
   white-space: nowrap;
 }
 
 .value {
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: 0.85rem;
+  font-weight: 700;
   text-align: right;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--text-color);
 }

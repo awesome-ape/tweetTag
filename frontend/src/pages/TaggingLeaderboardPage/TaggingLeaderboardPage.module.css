@@ -1,3 +1,4 @@
+/* TaggingLeaderboardPage.module.css */
 .page {
   min-height: 100vh;
   background: transparent;
@@ -6,24 +7,24 @@
 
 .container {
   max-width: 900px;
-  margin: 40px auto;
-  padding: 20px;
+  margin: 0 auto;
+  padding: 32px 20px 40px;
 }
 
-/* Header */
 .headerRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
   gap: 12px;
   flex-wrap: wrap;
 }
 
 .title {
   margin: 0;
+  font-size: 1.5rem;
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
 }
 
 .actions {
@@ -32,102 +33,115 @@
   flex-wrap: wrap;
 }
 
-/* Buttons */
-.backBtn,
-.refreshBtn {
-  padding: 10px 14px;
-  border-radius: 12px;
-  border: 1px solid var(--border-soft);
+.backBtn {
+  padding: 9px 16px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-soft);
   background: var(--btn-secondary-bg);
   color: var(--btn-secondary-text);
   cursor: pointer;
+  font-size: 0.85rem;
   font-weight: 700;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-.backBtn:hover,
-.refreshBtn:hover {
+.backBtn:hover {
   transform: translateY(-1px);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-soft);
 }
 
 .refreshBtn {
-  background: var(--tweeter-blue);
-  color: var(--btn-text);
-  border-color: var(--border-soft);
+  padding: 9px 16px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid transparent;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+
+.refreshBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  opacity: 0.92;
 }
 
 .refreshBtn:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
   transform: none;
-  box-shadow: none;
 }
 
-/* Table wrapper */
+/* Table */
 .tableWrap {
-  border: 1px solid var(--border-soft);
-  border-radius: 16px;
+  border: 1.5px solid var(--border-soft);
+  border-radius: var(--radius-lg);
   overflow: hidden;
   background: var(--card-bg);
   box-shadow: var(--shadow-card);
 }
 
-/* Table */
 .table {
   width: 100%;
   border-collapse: collapse;
   background: transparent;
 }
 
-/* Cells */
 .table th,
 .table td {
-  padding: 14px 12px;
+  padding: 13px 16px;
   text-align: center;
   border-bottom: 1px solid var(--border-soft);
-  color: #ffffff;
+  font-size: 0.9rem;
+  color: var(--text-color);
 }
 
-/* Header row */
 .table th {
-  background: var(--header-bg);
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
   color: #ffffff;
   font-weight: 800;
-  letter-spacing: 0.02em;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-/* Zebra rows */
-.table tr:nth-child(even) td {
-  background: var(--overlay);
+.table tbody tr:nth-child(even) td {
+  background: var(--surface-3);
 }
 
-.table tr:nth-child(odd) td {
-  background: var(--cat-oil);
+.table tbody tr:nth-child(odd) td {
+  background: transparent;
 }
 
-/* Hover */
 .table tbody tr:hover td {
-  background: var(--selected-cat-bg);
-  color: var(--selected-cat-text);
+  background: color-mix(in srgb, var(--accent-color) 8%, var(--card-bg));
+  color: var(--accent-color);
 }
 
-/* Remove last border */
+.table tbody tr:first-child td {
+  font-weight: 800;
+  color: var(--accent-color);
+}
+
 .table tbody tr:last-child td {
   border-bottom: none;
 }
 
-/* Info / error */
 .info {
   text-align: center;
-  padding: 20px;
-  color: var(--text-color);
-  opacity: 0.9;
+  padding: 24px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
 }
 
 .error {
   text-align: center;
-  padding: 10px;
+  padding: 14px;
   color: var(--danger);
   font-weight: 700;
+  font-size: 0.9rem;
+  background: color-mix(in srgb, var(--danger) 8%, var(--card-bg));
+  border: 1px solid color-mix(in srgb, var(--danger) 22%, var(--border-soft));
+  border-radius: var(--radius-md);
 }

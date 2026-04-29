@@ -1,117 +1,121 @@
 /* Header.module.css */
 .mainHeader {
-  /* Changed from .main-header */
-  position: static;
-  /* Use fixed to keep it at the top while scrolling */
-  width: 100%;
-  margin-bottom: 0;
+  position: sticky;
   top: 0;
   left: 0;
   right: 0;
-  height: 60px;
-  background-color: var(--header-bg);
-  color: var(--nav-text);
-  /* Use your index.css variable */
+  z-index: 100;
+  width: 100%;
+  height: 62px;
+  background: var(--header-bg);
+  backdrop-filter: blur(20px) saturate(1.8);
+  border-bottom: 1px solid var(--border-soft);
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 0 40px;
+  justify-content: space-between;
+  padding: 0 32px;
   box-sizing: border-box;
-  z-index: 10;
+  color: var(--nav-text);
 }
 
 .navLeft {
-  /* Changed from .nav-left */
-  font-weight: 600;
-  font-size: 18px;
-  letter-spacing: 1px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  background: linear-gradient(135deg, #6366f1 0%, #1d9bf0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  cursor: pointer;
+  user-select: none;
 }
 
 .navRight {
-  /* Changed from .nav-right */
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 10px;
+}
+
+.countBadge {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--btn-secondary-bg);
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  padding: 4px 10px;
+  white-space: nowrap;
 }
 
 .username {
-  font-size: 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--nav-text);
   opacity: 0.8;
+  white-space: nowrap;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .logoutBtn {
-  /* Changed from .logout-btn */
-  background-color: var(--danger);
-  /* Use your index.css variable */
-  border: none;
-  padding: 8px 16px;
-  color: white;
+  background: transparent;
+  border: 1.5px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  padding: 6px 14px;
+  color: var(--danger);
+  font-size: 0.85rem;
+  font-weight: 700;
   cursor: pointer;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.25s ease;
+  transition: background var(--transition-fast), border-color var(--transition-fast),
+    transform var(--transition-fast);
+  white-space: nowrap;
 }
 
+.logoutBtn:hover {
+  background: color-mix(in srgb, var(--danger) 10%, transparent);
+  border-color: var(--danger);
+  transform: translateY(-1px);
+}
+
+.logoutBtn:active {
+  transform: translateY(0);
+}
 
 @media (max-width: 900px) {
   .mainHeader {
     height: auto;
-    min-height: 60px;
+    min-height: 56px;
     padding: 10px 16px;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
   }
 
-  .navLeft {
-    font-size: 16px;
-    letter-spacing: 0.5px;
-    flex: 1 1 auto;
-    min-width: 0;
-  }
-
   .navRight {
-    gap: 12px;
+    gap: 8px;
     flex-wrap: wrap;
     justify-content: flex-end;
   }
 
   .username {
-    font-size: 13px;
-    max-width: 140px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .logoutBtn {
-    padding: 7px 12px;
-    font-size: 13px;
+    max-width: 120px;
   }
 }
 
 @media (max-width: 560px) {
   .mainHeader {
-    align-items: stretch;
     padding: 10px 12px;
   }
 
   .navLeft {
-    width: 100%;
-    text-align: center;
-    font-size: 15px;
+    font-size: 1rem;
   }
 
-  .navRight {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .username {
-    max-width: 55%;
+  .countBadge {
+    display: none;
   }
 
   .logoutBtn {
-    padding: 7px 10px;
+    padding: 6px 10px;
   }
 }

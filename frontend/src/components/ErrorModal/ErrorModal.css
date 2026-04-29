@@ -1,43 +1,72 @@
 /* ErrorModal.css */
-
 .modal-overlay {
   position: fixed;
-  top: 70px;
-  /* Distance from top */
+  top: 72px;
   left: 0;
   right: 0;
   display: flex;
   justify-content: center;
   pointer-events: none;
-  /* Allows you to click things BEHIND the message */
   z-index: 9999;
+  padding: 0 16px;
 }
 
 .modal-content {
   pointer-events: auto;
-  /* Makes the Close button clickable again */
-  background-color: var(--modal-bg);
-  color: var(--error-txt);
-  padding: 1rem 2rem;
-  border-radius: 8px;
-  border: 2px solid light-dark(#dddddd, #333333);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-
-  /* Animation to make it slide down from the top */
-  animation: slideDown 0.3s ease-out;
-
+  background: light-dark(#ffffff, #1f2937);
+  color: var(--text-color);
+  padding: 14px 20px;
+  border-radius: var(--radius-lg);
+  border: 1.5px solid light-dark(rgba(220, 38, 38, 0.25), rgba(239, 68, 68, 0.25));
+  box-shadow: var(--shadow-pop);
+  animation: slideDown 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
-  gap: 15px;
-  min-width: 300px;
+  gap: 12px;
+  max-width: 520px;
+  width: 100%;
+}
+
+.modal-content strong {
+  color: var(--danger);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.modal-content span {
+  flex: 1;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.modal-content button {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--btn-secondary-bg);
+  border: 1px solid var(--border-soft);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  padding: 0;
+  margin: 0;
+}
+
+.modal-content button:hover {
+  background: var(--danger);
+  color: #ffffff;
+  border-color: transparent;
 }
 
 @keyframes slideDown {
   from {
-    transform: translateY(-100%);
+    transform: translateY(-16px);
     opacity: 0;
   }
-
   to {
     transform: translateY(0);
     opacity: 1;

@@ -1,7 +1,7 @@
+/* Home.module.css — Admin dashboard */
 .page {
   position: relative;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
   background: transparent;
   color: var(--text-color);
 }
@@ -16,106 +16,141 @@
 .container {
   position: relative;
   z-index: 2;
-  height: calc(100vh - 80px);
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 88px 20px 16px;
-  box-sizing: border-box;
+  padding: 40px 24px;
+  min-height: calc(100vh - 62px);
 }
 
 .card {
-  width: min(760px, 100%);
-  padding: 24px 24px;
-  border: 1px solid var(--border-soft);
-  border-radius: 18px;
-  text-align: center;
+  width: min(920px, 100%);
   background: var(--card-bg);
+  border: 1.5px solid var(--border-soft);
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-card);
+  padding: 40px 36px;
   position: relative;
-  z-index: 3;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #6366f1, #1d9bf0);
 }
 
 .title {
-  margin: 0 0 8px;
-  font-size: 2rem;
-  color: var(--text-color);
+  margin: 0 0 6px;
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  background: linear-gradient(135deg, #6366f1 0%, #1d9bf0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .welcome {
-  margin-bottom: 20px;
+  margin: 0 0 28px;
   font-size: 1rem;
-  opacity: 0.9;
-  color: var(--text-color);
+  color: var(--text-muted);
 }
 
 .buttonGrid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
 }
 
 .btn {
   width: 100%;
-  min-height: 50px;
-  padding: 10px 12px;
-  border: none;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 500;
+  min-height: 64px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  font-size: 0.92rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
-}
-
-.btnDark {
-  background-color: var(--accent-color);
-  color: var(--btn-text);
-}
-
-.btnMid {
-  background-color: var(--tweeter-blue);
-  color: var(--btn-text);
-}
-
-.btnLight {
-  background-color: var(--accent-color);
-  color: var(--btn-text);
-  opacity: 0.8;
-}
-
-.fullWidthBtn {
-  grid-column: 1 / -1;
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+  text-align: center;
 }
 
 .btn:hover {
   transform: translateY(-2px);
-  opacity: 1;
+  box-shadow: var(--shadow-soft);
 }
 
 .btn:active {
   transform: translateY(0);
 }
 
-@media (max-width: 640px) {
-  .page {
-    height: auto;
-    min-height: 100vh;
-    overflow-y: auto;
-  }
+/* Primary CTA */
+.btnDark {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.30);
+}
 
+.btnDark:hover {
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.45) !important;
+  border-color: transparent !important;
+}
+
+/* Secondary CTA */
+.btnMid {
+  background: linear-gradient(135deg, #0ea5e9 0%, #1d9bf0 100%);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.28);
+}
+
+.btnMid:hover {
+  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.40) !important;
+  border-color: transparent !important;
+}
+
+/* Regular buttons */
+.btnLight {
+  background: var(--btn-secondary-bg);
+  color: var(--btn-secondary-text);
+}
+
+.btnLight:hover {
+  border-color: light-dark(rgba(99, 102, 241, 0.30), rgba(129, 140, 248, 0.30)) !important;
+}
+
+.fullWidthBtn {
+  grid-column: auto;
+}
+
+@media (max-width: 780px) {
+  .buttonGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
   .container {
-    height: auto;
-    min-height: calc(100vh - 80px);
-    padding: 96px 16px 20px;
+    padding: 20px 14px 28px;
     align-items: flex-start;
   }
 
   .card {
-    padding: 22px 16px;
+    padding: 28px 20px;
   }
 
   .title {
-    font-size: 1.85rem;
+    font-size: 1.75rem;
   }
 
   .buttonGrid {
