@@ -1,26 +1,64 @@
+/* EscalationTweet.module.css */
 .card {
-  border: 1px solid var(--border-soft);
-  border-radius: 18px;
   background: var(--card-bg);
-  box-shadow: var(--shadow-card);
-  padding: 16px;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg, 20px);
+  padding: 22px 26px;
+  width: 100%;
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Left accent bar — same as Tweet */
+.card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 14px;
+  bottom: 14px;
+  width: 3px;
+  background: var(--gradient-brand, linear-gradient(135deg, #1D9BF0, #0ea5e9));
+  border-radius: 0 var(--radius-full) var(--radius-full) 0;
 }
 
 .date {
-  font-size: 0.85rem;
-  opacity: 0.75;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-subtle);
   margin-bottom: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  flex-shrink: 0;
 }
 
 .scrollContainer {
   max-height: 340px;
   overflow-y: auto;
   padding-right: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-medium) transparent;
 }
 
-.content {
+.scrollContainer::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollContainer::-webkit-scrollbar-thumb {
+  background-color: var(--border-medium);
+  border-radius: var(--radius-full);
+}
+
+.content,
+.tweetText {
+  font-size: 1.02rem;
+  line-height: 1.72;
+  color: var(--text-color);
   white-space: pre-wrap;
   word-break: break-word;
+  unicode-bidi: plaintext;
   margin: 0;
 }
 
@@ -28,10 +66,6 @@
   max-height: 340px;
   overflow-y: auto;
   padding-right: 6px;
-}
-
-.tweetText {
-  white-space: pre-wrap;
-  word-break: break-word;
-  unicode-bidi: plaintext;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-medium) transparent;
 }

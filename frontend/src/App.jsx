@@ -15,6 +15,8 @@ import EditTweetPage from "./pages/EditTweetPage/EditTweetPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage/ForgotPasswordPage.jsx";
 import ResetPasswordPage from "./pages/ResetPasswordPage/ResetPasswordPage.jsx";
 import "./index.css";
+import UserTaggedTweetsPage from "./pages/UserTaggedTweetsPage/UserTaggedTweetsPage.jsx";
+import UserEditTweetPage from "./pages/UserEditTweetPage/UserEditTweetPage.jsx";
 import AdminDailyTaggingStatsPage from "./pages/AdminDailyTaggingStatsPage/AdminDailyTaggingStatsPage";
 import UserImpactPage from "./pages/UserImpactPage/UserImpactPage";
 import AdminUserInsightsPage from "./pages/AdminUserInsightsPage/AdminUserInsightsPage";
@@ -51,6 +53,8 @@ function App() {
                             <Route path="/admin-tagging-distribution" element={<AdminTaggingDistributionPage />} />
                             <Route path="/my-impact" element={<UserImpactPage />} />
                             <Route path="/admin-user-insights" element={<AdminUserInsightsPage />} />
+                            <Route path="/user-tagged-tweets" element={<UserTaggedTweetsPage />} />
+                            <Route path="/user-edit-tweet" element={<UserEditTweetPage />} />
 
 
             

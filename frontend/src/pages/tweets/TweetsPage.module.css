@@ -1,29 +1,30 @@
+/* TweetsPage.module.css */
 .page {
   min-height: 100vh;
+  padding-top: var(--header-h, 62px);
   display: flex;
   flex-direction: column;
   align-items: center;
-
 }
 
 .mainWrapper {
-  margin-top: 100px;
+  margin-top: 28px;
+  margin-bottom: 40px;
   background: var(--card-bg);
-  border: 1px solid var(--border-soft);
-  border-radius: 28px;
-  padding: 40px;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-xl, 26px);
   box-shadow: var(--shadow-card);
-  width: min(900px, 95vw);
+  width: min(920px, 95vw);
   display: flex;
   flex-direction: column;
-  padding: 20px 20px 40px 20px;
+  padding: 24px 28px 36px;
 }
 
 .container {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 25px;
+  gap: 22px;
 }
 
 .scrollableContent {
@@ -31,74 +32,94 @@
 }
 
 .sectionHeader {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 800;
-  color: var(--text-color);
-  opacity: 0.5;
+  color: var(--text-subtle);
   text-transform: uppercase;
-  letter-spacing: 1.5px;
-  margin-top: 10px;
+  letter-spacing: 1.8px;
+  margin-top: 8px;
+  margin-bottom: 2px;
 }
 
+/* Risk buttons row */
 .riskActions {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
 }
 
 .riskBtn {
   flex: 1;
-  padding: 14px;
-  font-weight: 700;
-  border-radius: 12px !important;
+  padding: 13px 10px;
+  font-size: 0.88rem;
+  font-weight: 800;
+  border-radius: var(--radius-md, 14px) !important;
   cursor: pointer;
-  transition: all 0.15s ease;
-
-  /* בסיס */
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease,
+    filter 120ms ease;
   border: 2px solid transparent;
+  letter-spacing: 0.02em;
 }
 
-/* 👇 אפקט לחיצה (כולם) */
 .riskBtn:active {
   transform: translateY(2px) scale(0.98);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2) inset;
 }
+
+.riskBtn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.20);
+}
+
+/* Category grid */
 .categoryGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  gap: 10px;
 }
 
 .catCard {
-  background: light-dark(rgba(0, 0, 0, 0.03), rgba(255, 255, 255, 0.05));
-  border: 2px solid var(--border-soft);
-  border-radius: 16px;
-  padding: 18px 5px;
-  font-size: 0.85rem;
+  background: var(--surface-3);
+  border: 2px solid var(--border-medium);
+  border-radius: var(--radius-md, 14px);
+  padding: 16px 6px;
+  font-size: 0.82rem;
   font-weight: 700;
   color: var(--text-color);
   cursor: pointer;
-  transition: all 0.2s ease;
+  text-align: center;
+  transition:
+    border-color 130ms ease,
+    color 130ms ease,
+    background 130ms ease,
+    transform 130ms ease,
+    box-shadow 130ms ease;
 }
 
-/* Highlighted state */
+.catCard:hover {
+  border-color: var(--tweeter-blue);
+  color: var(--tweeter-blue);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-soft);
+}
+
+/* Selected state */
 .active {
-  background-color: transparent !important; /* ❌ בלי מילוי */
-  
-  border: 2px solid var(--selected-cat-bg) !important; /* ✅ מסגרת כחולה */
+  background: transparent !important;
+  border: 2px solid var(--selected-cat-bg) !important;
   color: var(--selected-cat-bg) !important;
-
-  box-shadow: 0 0 0 2px rgba(255,255,255,0.05),
-              0 0 6px var(--selected-cat-bg);
-
-  transform: translateY(1px);
+  box-shadow: 0 0 0 3px rgba(29, 155, 240, 0.15), 0 0 10px rgba(29, 155, 240, 0.18) !important;
+  transform: translateY(-1px);
 }
 
+/* Bottom nav */
 .navActions {
   display: flex;
-  gap: 12px;
-  margin-top: 20px;
-  padding-top: 20px;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 18px;
   border-top: 1px solid var(--border-soft);
 }
 
@@ -106,20 +127,39 @@
   flex: 1;
 }
 
+/* Risk color states */
 .safe {
-  background-color: var(--safe);
+  background: var(--safe);
   border-color: var(--safe);
-  color: white;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.25);
 }
 
 .danger {
-  background-color: var(--risk-high);
+  background: var(--risk-high);
   border-color: var(--risk-high);
-  color: white;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.25);
 }
 
 .escalate {
-  background-color: var(--escalate);
+  background: var(--escalate);
   border-color: var(--escalate);
-  color: white;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.25);
+}
+
+@media (max-width: 640px) {
+  .mainWrapper {
+    padding: 18px 16px 28px;
+    margin-top: 16px;
+  }
+
+  .categoryGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .riskActions {
+    flex-direction: column;
+  }
 }

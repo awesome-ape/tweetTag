@@ -1,7 +1,8 @@
+/* TaggedTweetsPage.module.css */
 .page {
   position: relative;
   min-height: 100vh;
-  overflow-x: hidden;
+  padding-top: var(--header-h, 62px);
   background: transparent;
   color: var(--text-color);
 }
@@ -17,12 +18,10 @@
   position: relative;
   z-index: 2;
   min-height: 100vh;
-  padding-top: 90px;
-  padding-left: 20px;
-  padding-right: 20px;
-  padding-bottom: 30px;
-  max-width: 980px;
+  padding: 28px 20px 40px;
+  max-width: 1000px;
   margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .headerRow {
@@ -30,24 +29,28 @@
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
 .title {
   margin: 0;
-  font-size: 1.6rem;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
   color: var(--text-color);
 }
 
 .actions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .list {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .item {
@@ -55,65 +58,86 @@
 }
 
 .infoBox {
-  border: 1px solid var(--border-soft);
-  border-radius: 14px;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg, 20px);
   background: var(--card-bg);
-  box-shadow: var(--shadow-card);
-  padding: 16px;
-  opacity: 0.9;
+  box-shadow: var(--shadow-soft);
+  padding: 18px 20px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
 }
 
 .errorBox {
-  border: 1px solid var(--border-soft);
-  border-radius: 14px;
-  background: var(--card-bg);
-  box-shadow: var(--shadow-card);
-  padding: 16px;
-  margin-bottom: 14px;
+  border: 1px solid color-mix(in srgb, var(--danger) 40%, var(--border-soft));
+  border-radius: var(--radius-lg, 20px);
+  background: color-mix(in srgb, var(--danger) 8%, var(--card-bg));
+  box-shadow: var(--shadow-soft);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  color: var(--danger);
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 
 .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 14px;
-  margin-top: 18px;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-soft);
 }
 
 .pageLabel {
-  opacity: 0.85;
-  font-weight: 600;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  min-width: 80px;
+  text-align: center;
 }
 
-/* Buttons - consistent with your Home style */
+/* Buttons */
 .btn {
-  padding: 10px 14px;
-  border: none;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 600;
+  padding: 9px 18px;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-md, 12px);
+  font-size: 0.85rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  letter-spacing: 0.01em;
+  transition: transform 130ms ease, filter 130ms ease, box-shadow 130ms ease, opacity 130ms ease;
+}
+
+.btn:active {
+  transform: translateY(1px) scale(0.98);
 }
 
 .btnMid {
-  background-color: var(--tweeter-blue);
-  color: var(--btn-text);
+  background: var(--gradient-brand, linear-gradient(135deg, #1D9BF0, #0ea5e9));
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(29, 155, 240, 0.28);
+}
+
+.btnMid:hover:not(:disabled) {
+  filter: brightness(1.08);
+  box-shadow: 0 4px 14px rgba(29, 155, 240, 0.40);
+  transform: translateY(-1px);
 }
 
 .btnLight {
-  background-color: var(--accent-color);
-  color: var(--btn-text);
-  opacity: 0.8;
+  background: var(--btn-secondary-bg, #1e293b);
+  color: var(--btn-secondary-text, #ffffff);
+  border-color: var(--border-soft);
 }
 
-.btn:hover:enabled {
-  transform: translateY(-2px);
-  opacity: 1;
+.btnLight:hover:not(:disabled) {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
 }
 
 .btn:disabled {
   cursor: not-allowed;
-  opacity: 0.6;
+  opacity: 0.45;
   transform: none;
 }

@@ -5,7 +5,6 @@ import styles from "./HomeUser.module.css";
 
 export default function HomeUser() {
   const navigate = useNavigate();
-
   const token = localStorage.getItem("token");
   const username = localStorage.getItem("username") || "User";
 
@@ -20,28 +19,39 @@ export default function HomeUser() {
 
       <div className={styles.container}>
         <div className={styles.card}>
-          <h2 className={styles.title}>TweetTag #</h2>
-          <p className={styles.welcome}>hello {username}!</p>
 
-          <button
-            className={`${styles.btn} ${styles.btnPrimary}`}
-            onClick={() => navigate("/tweets")}
-          >
-            pull random tweet
-          </button>
+          {/* Gradient banner */}
+          <div className={styles.banner}>
+            <p className={styles.bannerGreeting}>Welcome back</p>
+            <h2 className={styles.bannerName}>{username}</h2>
+          </div>
 
-          <button
-            className={`${styles.btn} ${styles.btnSecondary}`}
-            onClick={() => navigate("/tags")}
-          >
-            view my tags
-          </button>
-          <button
-            className={`${styles.btn} ${styles.btnSecondary}`}
-            onClick={() => navigate("/my-impact")}
-          >
-            my impact
-          </button>
+          {/* Action grid */}
+          <div className={styles.grid}>
+            <button
+              className={`${styles.actionCard} ${styles.actionPrimary}`}
+              onClick={() => navigate("/tweets")}
+            >
+              <span className={styles.actionIcon}>⚡</span>
+              <span className={styles.actionLabel}>Pull Random Tweet</span>
+            </button>
+
+            <button className={styles.actionCard} onClick={() => navigate("/tags")}>
+              <span className={styles.actionIcon}>🏷️</span>
+              <span className={styles.actionLabel}>My Tags</span>
+            </button>
+
+            <button className={styles.actionCard} onClick={() => navigate("/user-tagged-tweets")}>
+              <span className={styles.actionIcon}>✏️</span>
+              <span className={styles.actionLabel}>Edit Tags</span>
+            </button>
+
+            <button className={styles.actionCard} onClick={() => navigate("/my-impact")}>
+              <span className={styles.actionIcon}>📈</span>
+              <span className={styles.actionLabel}>My Impact</span>
+            </button>
+          </div>
+
         </div>
       </div>
     </div>

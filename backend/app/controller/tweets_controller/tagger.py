@@ -116,8 +116,6 @@ async def claim_processed_tweet_endpoint(
     if not user_id:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
-    if not await is_admin(user_id):
-        raise HTTPException(status_code=403, detail="Forbidden: Admins only")
 
     tweet = await tagger.claim_processed_tweet(tweet_id, user_id)
 
@@ -152,3 +150,18 @@ async def submit_tagged_tweet_endpoint(
         raise HTTPException(status_code=400, detail=str(e))
 
     return {"message": "Tweet edited successfully"}
+@router.get("/search_my_processed_tweets", response_model=list[TweetinDB])
+async def search_my_processed_tweets_endpoint(
+    search: str,
+    limit: int = 20,
+    current_user=Depends(get_current_user),
+):
+    user_id = current_user.get("_id")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    return await tagger.search_my_processed_tweets(
+        user_id=str(user_id),
+        search=search,
+        limit=limit,
+    )
