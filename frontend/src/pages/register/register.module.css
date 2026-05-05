@@ -1,55 +1,83 @@
+/* register.module.css */
+
 .register-card {
-    background-color: var(--card-bg);
-    backdrop-filter: blur(12px);
-    padding: 2.5rem;
-    border-radius: 24px;
-    display: grid;
-    gap: 1.5rem;
-    /* Single column layout for stacked registration */
-    grid-template-columns: 1fr 1fr; 
-    grid-template-areas: 
-        "title title"
-        "user user"
-        "email email"
-        "pass pass"
-        "link reg";
-    width: 100%;
-    max-width: 400px;
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: clamp(28px, 5vw, 40px);
+  border-radius: var(--radius-xl, 26px);
+  border: 1px solid var(--border-medium);
+  box-shadow: var(--shadow-card);
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "title title"
+    "user  user"
+    "email email"
+    "pass  pass"
+    "link  reg";
+  width: 100%;
+  max-width: 420px;
+  align-items: center;
 }
 
-form { display: contents; }
-
-.login-header { 
-    grid-area: title; 
-    justify-self: center; 
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: var(--text-color);
+form {
+  display: contents;
 }
 
-.username-input { grid-area: user; grid-column: 1 / -1; }
-.email-input { grid-area: email; grid-column: 1 / -1; }
-.password-input { grid-area: pass; grid-column: 1 / -1; }
+.login-header {
+  grid-area: title;
+  justify-self: center;
+  font-size: 1.55rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--text-color);
+  margin-bottom: 4px;
+  text-align: center;
+}
 
-.btn-reg { 
-    grid-area: reg; 
-    
+.username-input {
+  grid-area: user;
+  grid-column: 1 / -1;
+}
+
+.email-input {
+  grid-area: email;
+  grid-column: 1 / -1;
+}
+
+.password-input {
+  grid-area: pass;
+  grid-column: 1 / -1;
+}
+
+.btn-reg {
+  grid-area: reg;
+  width: 100%;
+  justify-self: stretch;
 }
 
 .footer-text {
-    grid-area: link;
-    text-align: center;
-    color: var(--text-color);
-    font-size: 0.9rem;
+  grid-area: link;
+  text-align: left;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
 }
 
 .signin-link {
-    color: var(--tweeter-blue);
-    text-decoration: none;
-    font-weight: 600;
-    margin-left: 0.3rem;
+  color: var(--tweeter-blue);
+  text-decoration: none;
+  font-weight: 700;
+  margin-left: 0.25rem;
+  transition: opacity var(--transition-fast);
 }
 
 .signin-link:hover {
-    text-decoration: underline;
+  opacity: 0.75;
+  text-decoration: underline;
 }

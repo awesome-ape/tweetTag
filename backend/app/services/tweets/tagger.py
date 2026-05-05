@@ -280,3 +280,33 @@ async def claim_processed_tweet(tweet_id: str, user_id: str) -> Optional[Tweetin
         return_document=ReturnDocument.AFTER,
     )
     return TweetinDB.from_mongo(doc) if doc else None
+async def search_my_processed_tweets(
+    user_id: str,
+    search: str,
+    limit: int = 20,
+) -> List[TweetinDB]:
+    clean_search = search.strip()
+
+    if not clean_search:
+        return []
+
+    cursor = (
+        processed_collection.find(
+            {
+                "tagged_by": str(user_id),
+                "content": {"$regex": clean_search, "$options": "i"},
+                "status": {"$in": ["tagged", "tagging"]},
+            }
+        )
+        .sort([("tagged_at", -1), ("_id", -1)])
+        .limit(limit)
+    )
+
+    tweets: List[TweetinDB] = []
+
+    async for doc in cursor:
+        tweet = TweetinDB.from_mongo(doc)
+        if tweet:
+            tweets.append(tweet)
+
+    return tweets

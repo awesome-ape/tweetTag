@@ -1,7 +1,8 @@
+/* EscalatedTweetsPage.module.css */
 .page {
   position: relative;
   min-height: 100vh;
-  overflow-x: hidden;
+  padding-top: var(--header-h, 62px);
   background: transparent;
   color: var(--text-color);
 }
@@ -16,13 +17,9 @@
 .container {
   position: relative;
   z-index: 2;
-  min-height: 100vh;
-  padding-top: 90px;
-  padding-left: 20px;
-  padding-right: 20px;
-  padding-bottom: 30px;
-  max-width: 1100px;
+  max-width: 1120px;
   margin: 0 auto;
+  padding: 28px 20px 40px;
 }
 
 .headerRow {
@@ -30,34 +27,43 @@
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
 .title {
   margin: 0;
-  font-size: 1.6rem;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
   color: var(--text-color);
 }
 
 .actions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 
 .infoBox,
 .errorBox {
-  border: 1px solid var(--border-soft);
-  border-radius: 14px;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg, 20px);
   background: var(--card-bg);
-  box-shadow: var(--shadow-card);
-  padding: 16px;
-  opacity: 0.95;
+  box-shadow: var(--shadow-soft);
+  padding: 18px 20px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
 }
 
 .errorBox {
-  margin-bottom: 14px;
+  border-color: color-mix(in srgb, var(--danger) 35%, transparent);
+  background: color-mix(in srgb, var(--danger) 8%, var(--card-bg));
+  color: var(--danger);
+  font-weight: 600;
+  margin-bottom: 16px;
 }
 
+/* 3-column grid for tweet previews */
 .grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -81,77 +87,94 @@
   padding: 0;
   background: transparent;
   cursor: pointer;
-
-}
-
-.tweetButton:focus-visible {
-  outline: 2px solid var(--accent-color);
-  outline-offset: 4px;
-  border-radius: 18px;
+  width: 100%;
+  text-align: left;
+  transition: transform var(--transition-fast);
 }
 
 .tweetButton:hover {
   transform: translateY(-2px);
-  transition: transform 0.15s ease-in-out;
 }
 
-/* Buttons – זהה לרוח של Home */
-.btn {
-  padding: 10px 14px;
-  border: none;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
+.tweetButton:focus-visible {
+  outline: 2px solid var(--tweeter-blue);
+  outline-offset: 4px;
+  border-radius: var(--radius-lg, 20px);
 }
 
-.btnMid {
-  background-color: var(--tweeter-blue);
-  color: var(--btn-text);
-}
-
-.btnLight {
-  background-color: var(--accent-color);
-  color: var(--btn-text);
-  opacity: 0.8;
-}
-
-.btn:hover:enabled {
-  transform: translateY(-2px);
-  opacity: 1;
-}
-
-.btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
-  transform: none;
-}
-
+/* Preview card */
 .tweetPreviewCard {
-  border: 1px solid var(--border-soft);
-  border-radius: 18px;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg, 20px);
   background: var(--card-bg);
-  box-shadow: var(--shadow-card);
-  padding: 16px;
+  box-shadow: var(--shadow-soft);
+  padding: 18px;
   width: 100%;
   text-align: left;
+  transition: box-shadow var(--transition-fast);
+}
+
+.tweetPreviewCard:hover {
+  box-shadow: var(--shadow-pop);
 }
 
 .tweetPreviewDate {
-  font-size: 0.85rem;
-  opacity: 0.75;
+  font-size: 0.76rem;
+  color: var(--text-subtle);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
   margin-bottom: 10px;
 }
 
 .tweetPreviewScroll {
-  max-height: 220px;
+  max-height: 200px;
   overflow-y: auto;
   padding-right: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-medium) transparent;
 }
 
 .tweetPreviewText {
   white-space: pre-wrap;
   word-break: break-word;
   margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--text-color);
+}
+
+/* Buttons */
+.btn {
+  padding: 8px 18px;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-md, 12px);
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  transition: transform var(--transition-fast), filter var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.btnMid {
+  background: var(--gradient-brand, linear-gradient(135deg, #1D9BF0, #0ea5e9));
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(29, 155, 240, 0.26);
+}
+
+.btnLight {
+  background: var(--btn-secondary-bg, #1e293b);
+  color: var(--btn-secondary-text, #fff);
+  border-color: var(--border-soft);
+}
+
+.btn:hover:enabled {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.44;
+  transform: none;
 }

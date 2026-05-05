@@ -1,13 +1,15 @@
+/* TaggingLeaderboardPage.module.css */
 .page {
   min-height: 100vh;
+  padding-top: var(--header-h, 62px);
   background: transparent;
   color: var(--text-color);
 }
 
 .container {
-  max-width: 900px;
-  margin: 40px auto;
-  padding: 20px;
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 28px 20px 40px;
 }
 
 /* Header */
@@ -15,59 +17,71 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
   gap: 12px;
   flex-wrap: wrap;
 }
 
 .title {
   margin: 0;
+  font-size: 1.5rem;
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
+  color: var(--text-color);
 }
 
 .actions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
 /* Buttons */
 .backBtn,
 .refreshBtn {
-  padding: 10px 14px;
-  border-radius: 12px;
-  border: 1px solid var(--border-soft);
-  background: var(--btn-secondary-bg);
-  color: var(--btn-secondary-text);
+  padding: 9px 18px;
+  border-radius: var(--radius-md, 12px);
+  border: 1.5px solid var(--border-medium);
+  background: var(--btn-secondary-bg, #1e293b);
+  color: var(--btn-secondary-text, #ffffff);
   cursor: pointer;
+  font-size: 0.85rem;
   font-weight: 700;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  letter-spacing: 0.01em;
+  transition: transform 130ms ease, box-shadow 130ms ease, filter 130ms ease;
 }
 
 .backBtn:hover,
 .refreshBtn:hover {
+  filter: brightness(1.14);
   transform: translateY(-1px);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-soft);
 }
 
 .refreshBtn {
-  background: var(--tweeter-blue);
-  color: var(--btn-text);
-  border-color: var(--border-soft);
+  background: var(--gradient-brand, linear-gradient(135deg, #1D9BF0, #0ea5e9));
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(29, 155, 240, 0.28);
+}
+
+.refreshBtn:hover:not(:disabled) {
+  filter: brightness(1.08);
+  box-shadow: 0 4px 14px rgba(29, 155, 240, 0.40);
 }
 
 .refreshBtn:disabled {
-  opacity: 0.6;
+  opacity: 0.45;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+  filter: none;
 }
 
 /* Table wrapper */
 .tableWrap {
-  border: 1px solid var(--border-soft);
-  border-radius: 16px;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg, 20px);
   overflow: hidden;
   background: var(--card-bg);
   box-shadow: var(--shadow-card);
@@ -83,33 +97,53 @@
 /* Cells */
 .table th,
 .table td {
-  padding: 14px 12px;
+  padding: 13px 14px;
   text-align: center;
   border-bottom: 1px solid var(--border-soft);
-  color: #ffffff;
 }
 
 /* Header row */
 .table th {
-  background: var(--header-bg);
+  background: var(--gradient-brand, linear-gradient(135deg, #1D9BF0, #0ea5e9));
   color: #ffffff;
+  font-size: 0.8rem;
   font-weight: 800;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
-/* Zebra rows */
-.table tr:nth-child(even) td {
-  background: var(--overlay);
+/* Data cells */
+.table td {
+  color: var(--text-color);
+  font-size: 0.9rem;
 }
 
-.table tr:nth-child(odd) td {
-  background: var(--cat-oil);
+/* Zebra rows — light/dark safe */
+.table tbody tr:nth-child(even) td {
+  background: light-dark(rgba(0, 0, 0, 0.025), rgba(255, 255, 255, 0.03));
+}
+
+.table tbody tr:nth-child(odd) td {
+  background: transparent;
 }
 
 /* Hover */
 .table tbody tr:hover td {
-  background: var(--selected-cat-bg);
-  color: var(--selected-cat-text);
+  background: light-dark(rgba(29, 155, 240, 0.08), rgba(29, 155, 240, 0.10));
+  color: var(--text-color);
+}
+
+/* Top 3 rank highlights */
+.table tbody tr:nth-child(1) td {
+  background: light-dark(rgba(255, 215, 0, 0.10), rgba(255, 215, 0, 0.08));
+}
+
+.table tbody tr:nth-child(2) td {
+  background: light-dark(rgba(192, 192, 192, 0.10), rgba(192, 192, 192, 0.07));
+}
+
+.table tbody tr:nth-child(3) td {
+  background: light-dark(rgba(205, 127, 50, 0.10), rgba(205, 127, 50, 0.08));
 }
 
 /* Remove last border */
@@ -117,17 +151,18 @@
   border-bottom: none;
 }
 
-/* Info / error */
+/* Info / error text */
 .info {
   text-align: center;
-  padding: 20px;
-  color: var(--text-color);
-  opacity: 0.9;
+  padding: 24px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
 }
 
 .error {
   text-align: center;
-  padding: 10px;
+  padding: 12px;
   color: var(--danger);
   font-weight: 700;
+  font-size: 0.9rem;
 }

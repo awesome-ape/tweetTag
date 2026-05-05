@@ -1,117 +1,129 @@
 /* Header.module.css */
 .mainHeader {
-  /* Changed from .main-header */
-  position: static;
-  /* Use fixed to keep it at the top while scrolling */
-  width: 100%;
-  margin-bottom: 0;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 60px;
-  background-color: var(--header-bg);
-  color: var(--nav-text);
-  /* Use your index.css variable */
+  z-index: 200;
+  width: 100%;
+  height: var(--header-h, 62px);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 40px;
+  padding: 0 clamp(16px, 3vw, 44px);
   box-sizing: border-box;
-  z-index: 10;
+
+  background: var(--header-bg);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 0 2px 24px rgba(0, 0, 0, 0.22);
+  color: #ffffff;
 }
 
 .navLeft {
-  /* Changed from .nav-left */
-  font-weight: 600;
-  font-size: 18px;
-  letter-spacing: 1px;
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+  user-select: none;
+  color: #ffffff;
+}
+
+.navLeft:hover {
+  opacity: 0.78;
 }
 
 .navRight {
-  /* Changed from .nav-right */
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
+/* Pill badge — tag count */
+.countBadge {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.20);
+  border-radius: var(--radius-full, 9999px);
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  color: #ffffff;
+}
+
+/* Pill badge — username */
 .username {
-  font-size: 14px;
-  opacity: 0.8;
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--radius-full, 9999px);
+  padding: 4px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
 }
 
+/* Logout */
 .logoutBtn {
-  /* Changed from .logout-btn */
-  background-color: var(--danger);
-  /* Use your index.css variable */
-  border: none;
-  padding: 8px 16px;
-  color: white;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  padding: 5px 15px;
+  color: #ffffff;
   cursor: pointer;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.25s ease;
+  border-radius: var(--radius-full, 9999px);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
+.logoutBtn:hover {
+  background: rgba(239, 68, 68, 0.78);
+  border-color: rgba(239, 68, 68, 0.55);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 12px rgba(239, 68, 68, 0.28);
+}
 
-@media (max-width: 900px) {
+.logoutBtn:active {
+  transform: translateY(0);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 860px) {
   .mainHeader {
-    height: auto;
-    min-height: 60px;
-    padding: 10px 16px;
-    gap: 10px;
-    flex-wrap: wrap;
+    padding: 0 16px;
+    gap: 6px;
   }
 
-  .navLeft {
-    font-size: 16px;
-    letter-spacing: 0.5px;
-    flex: 1 1 auto;
-    min-width: 0;
-  }
-
-  .navRight {
-    gap: 12px;
-    flex-wrap: wrap;
-    justify-content: flex-end;
+  .countBadge {
+    display: none; /* hide on small screens to save space */
   }
 
   .username {
-    font-size: 13px;
-    max-width: 140px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    max-width: 100px;
+    font-size: 0.74rem;
   }
 
   .logoutBtn {
-    padding: 7px 12px;
-    font-size: 13px;
+    padding: 4px 12px;
+    font-size: 0.74rem;
   }
 }
 
-@media (max-width: 560px) {
-  .mainHeader {
-    align-items: stretch;
-    padding: 10px 12px;
-  }
-
-  .navLeft {
-    width: 100%;
-    text-align: center;
-    font-size: 15px;
-  }
-
-  .navRight {
-    width: 100%;
-    justify-content: space-between;
-  }
-
+@media (max-width: 500px) {
   .username {
-    max-width: 55%;
-  }
-
-  .logoutBtn {
-    padding: 7px 10px;
+    max-width: 70px;
   }
 }

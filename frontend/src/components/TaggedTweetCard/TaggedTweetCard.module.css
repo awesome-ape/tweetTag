@@ -1,11 +1,18 @@
+/* TaggedTweetCard.module.css */
 .card {
   width: 100%;
-  border: 1px solid var(--border-soft);
-  border-radius: 18px;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg, 20px);
   background: var(--card-bg);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-soft);
   color: var(--text-color);
-  padding: 18px;
+  padding: 20px 22px;
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-pop);
+  transform: translateY(-1px);
 }
 
 .topRow {
@@ -18,13 +25,13 @@
 .metaLeft {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
   min-width: 0;
 }
 
 .author {
-  font-weight: 600;
-  font-size: 1rem;
+  font-weight: 700;
+  font-size: 0.98rem;
   display: flex;
   gap: 8px;
   align-items: baseline;
@@ -32,85 +39,107 @@
 }
 
 .username {
-  opacity: 0.8;
+  opacity: 0.65;
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   white-space: nowrap;
+  color: var(--text-muted);
 }
 
 .date {
-  font-size: 0.85rem;
-  opacity: 0.75;
+  font-size: 0.78rem;
+  color: var(--text-subtle);
+  letter-spacing: 0.01em;
 }
 
 .metaRight {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .badge {
-  padding: 6px 10px;
-  border-radius: 999px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full, 9999px);
   border: 1px solid var(--border-soft);
-  background: rgba(255, 255, 255, 0.04);
-  font-size: 0.85rem;
+  background: var(--surface-3);
+  font-size: 0.75rem;
+  font-weight: 700;
   white-space: nowrap;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
 .link {
-  font-size: 0.9rem;
+  font-size: 0.84rem;
   text-decoration: none;
-  color: var(--accent-color);
-  font-weight: 600;
+  color: var(--tweeter-blue);
+  font-weight: 700;
+  padding: 4px 10px;
+  border: 1px solid rgba(29, 155, 240, 0.30);
+  border-radius: var(--radius-full);
+  transition: background var(--transition-fast), border-color var(--transition-fast);
 }
 
 .link:hover {
-  opacity: 0.9;
+  background: rgba(29, 155, 240, 0.10);
+  border-color: rgba(29, 155, 240, 0.50);
+  text-decoration: none;
 }
 
 .text {
-  margin-top: 12px;
-  font-size: 1rem;
-  line-height: 1.5;
+  margin-top: 14px;
+  font-size: 0.95rem;
+  line-height: 1.6;
   white-space: pre-wrap;
   word-break: break-word;
+  color: var(--text-color);
 }
 
 .divider {
-  margin: 14px 0;
+  margin: 16px 0;
   height: 1px;
   background: var(--border-soft);
-  opacity: 0.7;
 }
 
 .tagsRow {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px 14px;
+  gap: 8px 12px;
 }
 
 .tagItem {
   display: flex;
   justify-content: space-between;
-  gap: 10px;
-  padding: 10px 12px;
-  border-radius: 12px;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm, 10px);
   border: 1px solid var(--border-soft);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--surface-3);
+  transition: background var(--transition-fast);
+}
+
+.tagItem:hover {
+  background: var(--card-bg);
 }
 
 .label {
-  font-size: 0.85rem;
-  opacity: 0.75;
+  font-size: 0.78rem;
+  color: var(--text-subtle);
   white-space: nowrap;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .value {
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: 0.88rem;
+  font-weight: 700;
   text-align: right;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--text-color);
 }

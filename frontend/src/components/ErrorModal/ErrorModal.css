@@ -2,42 +2,39 @@
 
 .modal-overlay {
   position: fixed;
-  top: 70px;
-  /* Distance from top */
+  top: calc(var(--header-h, 62px) + 10px);
   left: 0;
   right: 0;
   display: flex;
   justify-content: center;
   pointer-events: none;
-  /* Allows you to click things BEHIND the message */
   z-index: 9999;
+  padding: 0 16px;
 }
 
 .modal-content {
   pointer-events: auto;
-  /* Makes the Close button clickable again */
-  background-color: var(--modal-bg);
+  background: var(--modal-bg);
   color: var(--error-txt);
-  padding: 1rem 2rem;
-  border-radius: 8px;
-  border: 2px solid light-dark(#dddddd, #333333);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-
-  /* Animation to make it slide down from the top */
-  animation: slideDown 0.3s ease-out;
-
+  padding: 14px 20px;
+  border-radius: var(--radius-lg, 20px);
+  border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(239, 68, 68, 0.12);
+  animation: slideDown 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   display: flex;
   align-items: center;
-  gap: 15px;
-  min-width: 300px;
+  gap: 12px;
+  min-width: 280px;
+  max-width: 480px;
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
 @keyframes slideDown {
   from {
-    transform: translateY(-100%);
+    transform: translateY(-20px);
     opacity: 0;
   }
-
   to {
     transform: translateY(0);
     opacity: 1;

@@ -1,5 +1,6 @@
 .page {
   min-height: 100vh;
+  padding-top: var(--header-h, 62px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -7,13 +8,13 @@
 
 .mainWrapper {
   width: min(1100px, 92vw);
-  margin-top: 100px;
+  margin-top: 24px;
   margin-bottom: 32px;
   background: var(--card-bg);
   padding: 28px;
-  border-radius: 28px;
+  border-radius: var(--radius-2xl, 28px);
   box-shadow: var(--shadow-card);
-  border: 1px solid var(--border-soft);
+  border: 1px solid var(--border-medium);
   display: flex;
   flex-direction: column;
   gap: 22px;
@@ -36,33 +37,34 @@
 
 .title {
   margin: 0;
-  font-size: clamp(2.2rem, 4vw, 3.4rem);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
   line-height: 1.05;
   color: var(--text-color);
 }
 
 .subtitle {
   margin: 0;
-  color: var(--nav-text);
+  color: var(--text-muted);
   font-size: 1rem;
-  opacity: 0.9;
 }
 
 .backBtn {
   background: var(--btn-secondary-bg);
   color: var(--btn-secondary-text);
-  padding: 12px 18px;
-  border-radius: 14px;
-  border: 1px solid var(--border-soft);
+  padding: 9px 18px;
+  border-radius: var(--radius-md, 12px);
+  border: 1px solid var(--border-medium);
   cursor: pointer;
-  box-shadow: var(--shadow-card);
+  font-size: 0.875rem;
   font-weight: 600;
-  transition: transform 0.18s ease, opacity 0.18s ease;
+  transition: transform var(--transition-fast), filter var(--transition-fast);
 }
 
 .backBtn:hover {
   transform: translateY(-1px);
-  opacity: 0.95;
+  filter: brightness(1.14);
 }
 
 .stateBox {
@@ -70,17 +72,18 @@
   display: grid;
   place-items: center;
   text-align: center;
-  background: var(--surface-2, var(--modal-bg));
+  background: var(--surface-3);
   border: 1px solid var(--border-soft);
-  border-radius: 22px;
+  border-radius: var(--radius-xl, 22px);
   padding: 20px;
-  color: var(--text-color);
+  color: var(--text-muted);
+  font-size: 0.92rem;
 }
 
 .summaryCard {
-  background: var(--surface-2, var(--modal-bg));
+  background: var(--surface-3);
   border: 1px solid var(--border-soft);
-  border-radius: 24px;
+  border-radius: var(--radius-xl, 22px);
   padding: 22px;
 }
 
@@ -98,15 +101,16 @@
 
 .summaryStat {
   background: var(--card-bg);
-  border: 1px solid var(--border-soft);
-  border-radius: 20px;
-  padding: 20px;
-  min-height: 150px;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg, 16px);
+  padding: 22px;
+  min-height: 140px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   box-sizing: border-box;
+  box-shadow: var(--shadow-xs);
 }
 
 .summaryLabel {
@@ -137,8 +141,7 @@
 
 .summarySubText {
   font-size: 0.95rem;
-  color: var(--nav-text);
-  opacity: 0.82;
+  color: var(--text-muted);
 }
 
 .bucketGrid {
@@ -253,7 +256,7 @@
     width: min(94vw, 94vw);
     padding: 18px;
     border-radius: 22px;
-    margin-top: 90px;
+    margin-top: 16px;
   }
 
   .title {
