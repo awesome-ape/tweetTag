@@ -108,12 +108,12 @@
   }
 
   .countBadge {
-    display: none; /* hide on small screens to save space */
+    padding: 4px 8px;
+    font-size: 0.7rem;
   }
 
   .username {
-    max-width: 100px;
-    font-size: 0.74rem;
+    display: none;
   }
 
   .logoutBtn {
@@ -122,8 +122,3 @@
   }
 }
 
-@media (max-width: 500px) {
-  .username {
-    max-width: 70px;
-  }
-}

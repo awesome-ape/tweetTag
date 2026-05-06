@@ -150,7 +150,7 @@ a:hover {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: var(--space-5) var(--space-4);
+  padding: clamp(12px, 3vw, 24px) clamp(10px, 3vw, 16px);
 }
 
 .container {
@@ -210,7 +210,7 @@ a:hover {
 .navbar-inner {
   max-width: var(--container-max);
   margin: 0 auto;
-  padding: 12px var(--space-5);
+  padding: 12px clamp(12px, 3vw, 24px);
   display: flex;
   align-items: center;
   justify-content: space-between;

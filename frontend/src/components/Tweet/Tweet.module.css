@@ -63,3 +63,14 @@
   white-space: pre-wrap;
   word-wrap: break-word;
 }
+
+@media (max-width: 640px) {
+  .card {
+    padding: 16px 16px;
+    max-height: 220px;
+  }
+
+  .content {
+    font-size: 0.95rem;
+  }
+}

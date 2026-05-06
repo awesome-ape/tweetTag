@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\yuvyu\\\\graduation project\\\\tweetTag\" -Depth 2)",
+      "Bash(Format-Table -Property Name, FullName)",
+      "Bash(Out-String)",
+      "PowerShell($pages = @\\(\\); Get-ChildItem -Recurse \"c:\\\\Users\\\\yuvyu\\\\graduation project\\\\tweetTag\\\\frontend\\\\src\\\\pages\" -ErrorAction SilentlyContinue | ForEach-Object { $pages += $_.FullName }; $pages | ForEach-Object { $_ })",
+      "PowerShell($comp = @\\(\\); Get-ChildItem -Recurse \"c:\\\\Users\\\\yuvyu\\\\graduation project\\\\tweetTag\\\\frontend\\\\src\\\\components\" -ErrorAction SilentlyContinue | ForEach-Object { $comp += $_.FullName }; $comp | ForEach-Object { $_ })"
+    ]
+  }
+}

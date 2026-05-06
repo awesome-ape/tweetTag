@@ -81,3 +81,21 @@ form {
   opacity: 0.75;
   text-decoration: underline;
 }
+
+@media (max-width: 400px) {
+  .register-card {
+    grid-template-areas:
+      "title title"
+      "user  user"
+      "email email"
+      "pass  pass"
+      "link  link"
+      "reg   reg";
+    padding: clamp(20px, 5vw, 28px);
+  }
+
+  .footer-text {
+    align-items: center;
+    text-align: center;
+  }
+}

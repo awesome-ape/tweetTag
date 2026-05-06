@@ -95,3 +95,21 @@ form {
   width: 100%;
   justify-self: stretch;
 }
+
+@media (max-width: 400px) {
+  .login-card {
+    grid-template-areas:
+      "title  title"
+      "user   user"
+      "pass   pass"
+      "forgot forgot"
+      "reg    reg"
+      "sub    sub";
+    padding: clamp(20px, 5vw, 28px);
+  }
+
+  .reg-container {
+    align-items: center;
+    text-align: center;
+  }
+}

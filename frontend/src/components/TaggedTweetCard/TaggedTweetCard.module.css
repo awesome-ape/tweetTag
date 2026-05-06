@@ -143,3 +143,21 @@
   white-space: nowrap;
   color: var(--text-color);
 }
+
+@media (max-width: 600px) {
+  .card {
+    padding: 14px 14px;
+  }
+
+  .topRow {
+    flex-wrap: wrap;
+  }
+
+  .metaRight {
+    flex-wrap: wrap;
+  }
+
+  .tagsRow {
+    grid-template-columns: 1fr;
+  }
+}

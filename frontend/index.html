@@ -7,6 +7,14 @@
     <title>frontend</title>
   </head>
   <body>
+    <script>
+      (function () {
+        var saved = localStorage.getItem('user-theme');
+        var theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.body.classList.add(theme);
+        document.documentElement.style.colorScheme = theme;
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

@@ -209,7 +209,7 @@
   }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 620px) {
   .hero {
     flex-direction: column;
     text-align: center;
@@ -219,9 +219,18 @@
   .heroCta {
     width: 100%;
   }
+}
 
+@media (max-width: 520px) {
   .container {
     padding: 20px 14px 40px;
     gap: 22px;
+  }
+}
+
+@media (max-width: 400px) {
+  .grid4,
+  .grid5 {
+    grid-template-columns: 1fr;
   }
 }

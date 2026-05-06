@@ -69,3 +69,14 @@
   scrollbar-width: thin;
   scrollbar-color: var(--border-medium) transparent;
 }
+
+@media (max-width: 640px) {
+  .card {
+    padding: 16px 16px;
+  }
+
+  .content,
+  .tweetText {
+    font-size: 0.95rem;
+  }
+}

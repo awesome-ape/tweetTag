@@ -141,3 +141,33 @@
   opacity: 0.45;
   transform: none;
 }
+
+@media (max-width: 640px) {
+  .container {
+    padding: 16px 14px 32px;
+  }
+
+  .title {
+    font-size: 1.2rem;
+  }
+
+  .headerRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .actions {
+    width: 100%;
+  }
+}
+
+@media (max-width: 400px) {
+  .pagination {
+    gap: 6px;
+  }
+
+  .pageLabel {
+    min-width: 60px;
+    font-size: 0.8rem;
+  }
+}
