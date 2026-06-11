@@ -56,7 +56,11 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=["*"],  # In development, this allows any frontend to connect
+    allow_origins=[
+        "https://main.d2oqwmp8m9aqey.amplifyapp.com",
+        "http://localhost:5173",
+        "http://localhost:3000",
+    ],
     allow_methods=["*"],
     allow_headers=["*"],
 )
