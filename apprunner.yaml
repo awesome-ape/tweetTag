@@ -1,46 +1,4 @@
-version: 1.0
-runtime: python311
 
-build:
-  commands:
-    build:
-      - echo "Build phase"
-
-run:
-  runtime-version: 3.11
-  pre-run:
-    - pip3 install -r requirements.txt
-  command: python3 -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8080
-  network:
-    port: 8080
-  env:
-    - name: MONGO_URI
-      value: mongodb+srv://yuvalco:QxLprn8FnonRfdDX@cluster0.vquudw5.mongodb.net/
-
-    - name: TIMEOUT_LIMIT
-      value: "600"
-
-    - name: TIMEOUT_LOCK_CHECK
-      value: "60"
-
-    - name: PAGE_SIZE
-      value: "50"
-
-    - name: APIFY_API_TOKEN
-      value: apify_api_75mqO5UX7V3s9POSZXIEgsBpTrrB0D2j6nNV
-
-    - name: SMTP_PORT
-      value: "587"
-
-    - name: EMAIL_FROM
-      value: tweettag56@gmail.com
-
-    - name: APP_PASSWORD
-      value: lyguldhjhioumasa
-
-    - name: SMTP_HOST
-      value: smtp.gmail.com
-    
 
     
 
