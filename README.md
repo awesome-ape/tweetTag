@@ -154,17 +154,18 @@ The Vite development server will then start the frontend application.
 
 ## Environment Variables
 
-The application relies on environment variables for sensitive configuration.
+The application uses environment variables to manage sensitive configuration.
 
-Example:
+Create a `.env` file and configure the required variables:
 
 ```env
 MONGO_URI=your_mongodb_connection_string
-APIFY_API_TOKEN=your_apify_token
-SECRET_KEY=your_jwt_secret
+APIFY_API_TOKEN=your_apify_api_token
+SECRET_KEY=your_jwt_secret_key
 ```
 
-Do not commit real credentials or `.env` files to the repository.
+> **Security:** Never commit your `.env` file or real credentials to the repository.
+
 
 ## Purpose
 
