@@ -103,7 +103,6 @@ async def forgot_password(email: str):
     reset_link = f"{frontend_url}/reset-password?token={token}"
 
     email_result = await send_reset_link(email, reset_link)
-    print(email_result)
 
     if email_result != "success":
 
@@ -115,12 +114,9 @@ async def forgot_password(email: str):
 
 
 async def reset_password(token: str, new_password: str):
-    print("RESET PASSWORD CALLED")
-    print("TOKEN:", token)
-    print("NEW PASSWORD:", new_password)
+   
 
     payload = decode_password_reset_token(token)
-    print("PAYLOAD:", payload)
 
     user_id = payload["sub"]
     jti = payload["jti"]
@@ -132,7 +128,6 @@ async def reset_password(token: str, new_password: str):
             "used": False,
         }
     )
-    print("RESET RECORD:", reset_record)
 
     if not reset_record:
         raise ValueError("Invalid or already used reset token")
@@ -152,19 +147,17 @@ async def reset_password(token: str, new_password: str):
         raise ValueError("Invalid user id in token")
 
     user = await users_collection.find_one({"_id": oid})
-    print("USER FOUND:", user)
+   
 
     if not user:
         raise ValueError("User not found")
 
     new_hashed_password = hash_password(new_password)
-    print("NEW HASH:", new_hashed_password)
 
     result = await users_collection.update_one(
         {"_id": oid},
         {"$set": {"password": new_hashed_password}},
     )
-    print("UPDATE RESULT matched:", result.matched_count, "modified:", result.modified_count)
 
     await password_reset_tokens_collection.update_one(
         {"_id": reset_record["_id"]},
